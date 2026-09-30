@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>حجز جلسة - أخصائية نفسية</title>
+    <title data-i18n="pageTitle">حجز جلسة - أخصائية نفسية</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -20,12 +20,32 @@
             color: var(--text-main);
             margin: 0;
             padding: 0;
+            transition: all 0.3s ease;
         }
 
         .container {
             max-width: 900px;
             margin: 0 auto;
             padding: 20px;
+        }
+
+        /* تنسيق شريط اختيار اللغة */
+        .top-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .lang-select {
+            padding: 8px 15px;
+            border: 1px solid var(--primary-color);
+            border-radius: 20px;
+            background-color: white;
+            color: var(--primary-color);
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
         }
 
         .hero {
@@ -76,9 +96,10 @@
             border-radius: 10px;
             font-family: 'Cairo', sans-serif;
             background-color: #fafafa;
+            box-sizing: border-box;
         }
 
-        .form-group input:focus, .form-group textarea:focus {
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
             outline: none;
             border-color: var(--primary-color);
             background-color: #fff;
@@ -101,7 +122,6 @@
             background-color: #835b5c;
         }
 
-        /* تنسيق الشبكة للحقول */
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -118,55 +138,150 @@
 <body>
 
     <div class="container">
-        <!-- قسم الترحيب -->
+        <!-- شريط تغيير اللغة -->
+        <div class="top-bar">
+            <select class="lang-select" onchange="changeLanguage(this.value)">
+                <option value="ar">العربية</option>
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+                <option value="es">Español</option>
+            </select>
+        </div>
+
         <header class="hero">
-            <h1>أهلاً بك في فضائك الآمن للاستماع والدعم</h1>
-            <p>أرافقك بكل لطف في فهم نفسك وما تمر به.</p>
+            <h1 data-i18n="heroTitle">أهلاً بك في فضائك الآمن للاستماع والدعم</h1>
+            <p data-i18n="heroSubtitle">أرافقك بكل لطف في فهم نفسك وما تمر به.</p>
         </header>
 
-        <!-- قسم الحجز -->
         <section class="booking-section">
-            <h2>حجز جلسة</h2>
-            <p style="text-align: center; margin-bottom: 30px;">يُرجى تعبئة الاستمارة أدناه لإرسال طلب الحجز، وسيتصل بكم فريقنا لتأكيد حجزكم.</p>
+            <h2 data-i18n="formTitle">حجز جلسة</h2>
+            <p style="text-align: center; margin-bottom: 30px;" data-i18n="formDesc">يُرجى تعبئة الاستمارة أدناه لإرسال طلب الحجز، وسيتصل بكم فريقنا لتأكيد حجزكم.</p>
             
-            <!-- نموذج الحجز - يمكن ربطه بـ Formspree كبداية سريعة -->
             <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>الاسم واللقب *</label>
+                        <label data-i18n="labelName">الاسم واللقب *</label>
                         <input type="text" name="name" required>
                     </div>
                     <div class="form-group">
-                        <label>العمر *</label>
+                        <label data-i18n="labelAge">العمر *</label>
                         <input type="number" name="age" required>
                     </div>
                     <div class="form-group">
-                        <label>رقم الهاتف / واتساب *</label>
+                        <label data-i18n="labelPhone">رقم الهاتف / واتساب *</label>
                         <input type="tel" name="phone" required>
                     </div>
                     <div class="form-group">
-                        <label>البريد الإلكتروني</label>
+                        <label data-i18n="labelEmail">البريد الإلكتروني</label>
                         <input type="email" name="email">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label>نوع الجلسة *</label>
+                    <label data-i18n="labelSessionType">نوع الجلسة *</label>
                     <select name="session_type" required>
-                        <option value="online">أونلاين عبر الواتساب</option>
-                        <option value="in_person">حضوري</option>
+                        <option value="online" data-i18n="optionOnline">أونلاين عبر الواتساب</option>
+                        <option value="in_person" data-i18n="optionInPerson">حضوري</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label>وصف مختصر للصعوبة أو الطلب الحالي *</label>
+                    <label data-i18n="labelDetails">وصف مختصر للصعوبة أو الطلب الحالي *</label>
                     <textarea name="description" rows="4" required></textarea>
                 </div>
 
-                <button type="submit" class="submit-btn">إرسال طلب الحجز</button>
+                <button type="submit" class="submit-btn" data-i18n="btnSubmit">إرسال طلب الحجز</button>
             </form>
         </section>
     </div>
 
+    <!-- كود الجافاسكربت للترجمة -->
+    <script>
+        const translations = {
+            ar: {
+                pageTitle: "حجز جلسة - أخصائية نفسية",
+                heroTitle: "أهلاً بك في فضائك الآمن للاستماع والدعم",
+                heroSubtitle: "أرافقك بكل لطف في فهم نفسك وما تمر به.",
+                formTitle: "حجز جلسة",
+                formDesc: "يُرجى تعبئة الاستمارة أدناه لإرسال طلب الحجز، وسيتصل بكم فريقنا لتأكيد حجزكم.",
+                labelName: "الاسم واللقب *",
+                labelAge: "العمر *",
+                labelPhone: "رقم الهاتف / واتساب *",
+                labelEmail: "البريد الإلكتروني",
+                labelSessionType: "نوع الجلسة *",
+                optionOnline: "أونلاين عبر الواتساب",
+                optionInPerson: "حضوري",
+                labelDetails: "وصف مختصر للصعوبة أو الطلب الحالي *",
+                btnSubmit: "إرسال طلب الحجز"
+            },
+            en: {
+                pageTitle: "Book a Session - Psychologist",
+                heroTitle: "Welcome to your safe space for listening and support",
+                heroSubtitle: "I gently accompany you in understanding yourself and what you are going through.",
+                formTitle: "Book a Session",
+                formDesc: "Please fill out the form below to submit your booking request. Our team will contact you to confirm.",
+                labelName: "Full Name *",
+                labelAge: "Age *",
+                labelPhone: "Phone Number / WhatsApp *",
+                labelEmail: "Email",
+                labelSessionType: "Session Type *",
+                optionOnline: "Online via WhatsApp",
+                optionInPerson: "In-Person",
+                labelDetails: "Brief description of the difficulty or current request *",
+                btnSubmit: "Submit Booking Request"
+            },
+            fr: {
+                pageTitle: "Réserver une séance - Psychologue",
+                heroTitle: "Bienvenue dans votre espace d'écoute et de bienveillance",
+                heroSubtitle: "Je vous accompagne avec bienveillance dans la compréhension de vous-même.",
+                formTitle: "Réserver une séance",
+                formDesc: "Veuillez remplir le formulaire ci-dessous. Notre équipe vous contactera pour confirmer votre rendez-vous.",
+                labelName: "Nom et prénom *",
+                labelAge: "Âge *",
+                labelPhone: "Numéro de téléphone / WhatsApp *",
+                labelEmail: "E-mail",
+                labelSessionType: "Type de séance *",
+                optionOnline: "En ligne (WhatsApp)",
+                optionInPerson: "Présentiel",
+                labelDetails: "Brève description de la difficulté ou de la demande *",
+                btnSubmit: "Envoyer ma demande"
+            },
+            es: {
+                pageTitle: "Reservar una sesión - Psicóloga",
+                heroTitle: "Bienvenido a tu espacio seguro de escucha y apoyo",
+                heroSubtitle: "Te acompaño con amabilidad a comprenderte a ti mismo y lo que estás pasando.",
+                formTitle: "Reservar una sesión",
+                formDesc: "Complete el siguiente formulario. Nuestro equipo se comunicará con usted para confirmar su cita.",
+                labelName: "Nombre completo *",
+                labelAge: "Edad *",
+                labelPhone: "Número de teléfono / WhatsApp *",
+                labelEmail: "Correo electrónico",
+                labelSessionType: "Tipo de sesión *",
+                optionOnline: "En línea (WhatsApp)",
+                optionInPerson: "Presencial",
+                labelDetails: "Breve descripción de la dificultad o solicitud *",
+                btnSubmit: "Enviar solicitud de reserva"
+            }
+        };
+
+        function changeLanguage(lang) {
+            // تغيير اتجاه الصفحة حسب اللغة
+            if (lang === 'ar') {
+                document.documentElement.setAttribute('dir', 'rtl');
+            } else {
+                document.documentElement.setAttribute('dir', 'ltr');
+            }
+            document.documentElement.setAttribute('lang', lang);
+
+            // استبدال النصوص
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+        }
+    </script>
 </body>
 </html>
