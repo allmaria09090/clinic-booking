@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم الحجوزات - د. ماريا</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- مكتبات Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <style>
+        body { font-family: 'Cairo', sans-serif; background-color: #fcf9f8; margin: 0; padding: 20px; color: #4a3f3e; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); overflow-x: auto;}
+        h1 { color: #9c6f70; text-align: center; border-bottom: 2px solid #f3e8d9; padding-bottom: 15px; }
+        
+        #loginScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #9c6f70; display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .login-box { background: white; padding: 40px; border-radius: 15px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .login-box input { width: 100%; padding: 12px; margin: 15px 0; border: 1.5px solid #ecdcdb; border-radius: 8px; font-family: 'Cairo'; }
+        .login-box button { background: #9c6f70; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; width: 100%; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; min-width: 900px; }
+        th, td { border: 1px solid #ecdcdb; padding: 12px; text-align: right; }
+        th { background-color: #fdf7f0; color: #9c6f70; }
+        tr:hover { background-color: #fcf9f8; }
+        
+        select.status-dropdown { padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-family: 'Cairo'; font-weight: bold; cursor: pointer; width: 100%;}
+        .status-red { background-color: #ffeaea; color: #d32f2f; }
+        .status-green { background-color: #eaf4ed; color: #2d6a4f; }
+        .status-grey { background-color: #f0f0f0; color: #666; }
+    </style>
+</head>
+<body>
+
+    <!-- شاشة تسجيل الدخول -->
+    <div id="loginScreen">
+        <div class="login-box">
+            <h2 style="color: #9c6f70;">تسجيل الدخول للإدارة</h2>
+            <input type="password" id="adminPass" placeholder="أدخل كلمة المرور...">
+            <button onclick="checkPassword()">دخول</button>
+            <p id="errorMsg" style="color: red; display: none; font-size: 14px;">كلمة المرور خاطئة!</p>
+        </div>
+    </div>
+
+    <!-- لوحة التحكم -->
+    <div class="container" id="adminPanel" style="display: none;">
+        <h1>لوحة تحكم الحجوزات 📋</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>تاريخ الطلب</th>
+                    <th>الاسم واللقب</th>
+                    <th>العمر</th>
+                    <th>رقم الهاتف</th>
+                    <th>نوع الجلسة</th>
+                    <th>الموقع</th>
+                    <th>التفاصيل</th>
+                    <th>حالة الطلب</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- سيتم الجلب هنا -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const SECRET_PASSWORD = "maria"; 
+
+        function checkPassword() {
+            if (document.getElementById('adminPass').value === SECRET_PASSWORD) {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                fetchData();
+            } else {
+                document.getElementById('errorMsg').style.display = 'block';
+            }
+        }
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA7R_QtuHcNVKPS82JH4eQmLy1ay6UYBJY",
+            authDomain: "maria-clinic.firebaseapp.com",
+            projectId: "maria-clinic",
+            storageBucket: "maria-clinic.firebasestorage.app",
+            messagingSenderId: "166573964155",
+            appId: "1:166573964155:web:13c1289a3e561b7c1b1bde"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        function fetchData() {
+            const tableBody = document.getElementById('tableBody');
+            
+            db.collection("bookings").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
+                tableBody.innerHTML = ""; 
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    
+                    let dateStr = "الآن";
+                    if(data.timestamp) {
+                        const date = data.timestamp.toDate();
+                        dateStr = date.toLocaleDateString('ar-EG') + "<br>" + date.toLocaleTimeString('ar-EG');
+                    }
+
+                    let statusClass = "status-red";
+                    if(data.status.includes("تم الرد")) statusClass = "status-green";
+                    if(data.status.includes("ملغى")) statusClass = "status-grey";
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td dir="ltr" style="text-align: right;">${dateStr}</td>
+                        <td>${data.firstName} ${data.lastName}</td>
+                        <td>${data.age}</td>
+                        <td dir="ltr" style="text-align: right;">${data.phone}</td>
+                        <td>${data.sessionType === 'online' ? 'أونلاين' : 'حضوري'}</td>
+                        <td>${data.country}<br>${data.city}</td>
+                        <td><textarea readonly style="width:100%; height:60px; font-family:Cairo; border:none; resize:none;">${data.description}</textarea></td>
+                        <td>
+                            <select class="status-dropdown ${statusClass}" onchange="updateStatus('${doc.id}', this)">
+                                <option value="🔴 لم يتم الرد" ${data.status === '🔴 لم يتم الرد' ? 'selected' : ''}>🔴 لم يتم الرد</option>
+                                <option value="🟢 تم الرد" ${data.status === '🟢 تم الرد' ? 'selected' : ''}>🟢 تم الرد</option>
+                                <option value="⚪ ملغى" ${data.status === '⚪ ملغى' ? 'selected' : ''}>⚪ ملغى</option>
+                            </select>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            });
+        }
+
+        function updateStatus(docId, selectElement) {
+            const newStatus = selectElement.value;
+            db.collection("bookings").doc(docId).update({ status: newStatus }).then(() => {
+                selectElement.className = "status-dropdown";
+                if(newStatus.includes("تم الرد")) selectElement.classList.add("status-green");
+                else if(newStatus.includes("ملغى")) selectElement.classList.add("status-grey");
+                else selectElement.classList.add("status-red");
+            });
+        }
+    </script>
+</body>
+</html>
