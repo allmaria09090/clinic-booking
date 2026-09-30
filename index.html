@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="fr" dir="ltr"> <!-- جعلنا الافتراضي هنا فرنسي تحسباً قبل عمل الجافاسكربت -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="pageTitle">حجز جلسة - أخصائية نفسية</title>
+    <title data-i18n="pageTitle">Réserver une séance - Psychologue</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -27,6 +27,7 @@
             position: relative;
             background-color: #fcf9f8;
             overflow-x: hidden;
+            transition: all 0.3s ease;
         }
 
         /* صورة الخلفية مع تأثير الحركة الانسيابية */
@@ -35,12 +36,12 @@
             top: 0;
             left: 0;
             width: 100vw;
-            height: 120vh; /* أطول من الشاشة بقليل لإعطاء مساحة للحركة أثناء التمرير */
+            height: 120vh;
             background-image: url('3.jpg');
             background-size: cover;
             background-position: center top;
             z-index: -2;
-            will-change: transform; /* تحسين الأداء على الهواتف */
+            will-change: transform;
         }
 
         /* طبقة تعتيم لونية هادئة */
@@ -69,6 +70,11 @@
             display: flex;
             justify-content: flex-end;
             margin-bottom: 25px;
+        }
+
+        /* تعديل الاتجاه لشريط اللغة ليناسب اللغات الأجنبية كافتراضي */
+        html[dir="ltr"] .top-bar {
+            justify-content: flex-end;
         }
 
         .lang-select {
@@ -153,7 +159,6 @@
         }
 
         .form-group input, 
-        .form-group textarea, 
         .form-group select {
             width: 100%;
             padding: 13px 16px;
@@ -164,6 +169,21 @@
             font-size: 0.95em;
             color: var(--text-main);
             transition: border-color 0.25s, box-shadow 0.25s;
+        }
+
+        /* تخصيص مربع الوصف بحجم ثابت وكبير لمنع تخريبه للواجهة */
+        .form-group textarea {
+            width: 100%;
+            padding: 13px 16px;
+            border: 1.5px solid #ecdcdb;
+            border-radius: 12px;
+            font-family: 'Cairo', sans-serif;
+            background-color: rgba(255, 255, 255, 0.85);
+            font-size: 0.95em;
+            color: var(--text-main);
+            transition: border-color 0.25s, box-shadow 0.25s;
+            resize: none; /* إيقاف السحب العشوائي بالماوس */
+            height: 160px; /* حجم ثابت وكبير لكتابة وصف طويل */
         }
 
         .form-group input:focus, 
@@ -222,56 +242,64 @@
     <div class="container">
         <div class="top-bar">
             <select class="lang-select" onchange="changeLanguage(this.value)">
+                <option value="fr">Français</option>
                 <option value="ar">العربية</option>
                 <option value="en">English</option>
-                <option value="fr">Français</option>
                 <option value="es">Español</option>
             </select>
         </div>
 
         <header class="hero">
-            <h1 data-i18n="heroTitle">أهلاً بك في فضائك الآمن للاستماع والدعم</h1>
-            <p data-i18n="heroSubtitle">أرافقك بكل لطف في فهم نفسك وما تمر به.</p>
+            <h1 data-i18n="heroTitle">Bienvenue dans votre espace d'écoute et de bienveillance</h1>
+            <p data-i18n="heroSubtitle">Je vous accompagne avec bienveillance dans la compréhension de vous-même.</p>
         </header>
 
         <section class="booking-section">
-            <h2 data-i18n="formTitle">حجز جلسة</h2>
-            <p class="section-desc" data-i18n="formDesc">يُرجى تعبئة الاستمارة أدناه لإرسال طلب الحجز، وسيتصل بكم فريقنا لتأكيد حجزكم.</p>
+            <h2 data-i18n="formTitle">Réserver une séance</h2>
+            <p class="section-desc" data-i18n="formDesc">Veuillez remplir le formulaire ci-dessous. Notre équipe vous contactera pour confirmer votre rendez-vous.</p>
             
             <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label data-i18n="labelName">الاسم واللقب *</label>
+                        <label data-i18n="labelName">Nom et prénom *</label>
                         <input type="text" name="name" required>
                     </div>
                     <div class="form-group">
-                        <label data-i18n="labelAge">العمر *</label>
+                        <label data-i18n="labelAge">Âge *</label>
                         <input type="number" name="age" required>
                     </div>
                     <div class="form-group">
-                        <label data-i18n="labelPhone">رقم الهاتف / واتساب *</label>
+                        <label data-i18n="labelPhone">Numéro de téléphone / WhatsApp *</label>
                         <input type="tel" name="phone" required>
                     </div>
+                    <!-- الإيميل أصبح بدون required ليكون اختيارياً -->
                     <div class="form-group">
-                        <label data-i18n="labelEmail">البريد الإلكتروني</label>
+                        <label data-i18n="labelEmail">E-mail</label>
                         <input type="email" name="email">
                     </div>
                 </div>
 
+                <!-- حقل موقع السكن يمتد على عرض الواجهة بشكل أنيق ومريح (اختياري) -->
                 <div class="form-group">
-                    <label data-i18n="labelSessionType">نوع الجلسة *</label>
+                    <label data-i18n="labelLocation">Lieu de résidence (Pays, Ville, État)</label>
+                    <input type="text" name="location">
+                </div>
+
+                <div class="form-group">
+                    <label data-i18n="labelSessionType">Type de séance *</label>
                     <select name="session_type" required>
-                        <option value="online" data-i18n="optionOnline">أونلاين عبر الواتساب</option>
-                        <option value="in_person" data-i18n="optionInPerson">حضوري</option>
+                        <option value="online" data-i18n="optionOnline">En ligne (WhatsApp)</option>
+                        <option value="in_person" data-i18n="optionInPerson">Présentiel</option>
                     </select>
                 </div>
 
+                <!-- حقل الوصف أصبح بدون required ليكون اختيارياً وبحجم ثابت -->
                 <div class="form-group">
-                    <label data-i18n="labelDetails">وصف مختصر للصعوبة أو الطلب الحالي *</label>
-                    <textarea name="description" rows="4" required></textarea>
+                    <label data-i18n="labelDetails">Brève description de la difficulté ou de la demande</label>
+                    <textarea name="description"></textarea>
                 </div>
 
-                <button type="submit" class="submit-btn" data-i18n="btnSubmit">إرسال طلب الحجز</button>
+                <button type="submit" class="submit-btn" data-i18n="btnSubmit">Envoyer ma demande</button>
             </form>
         </section>
     </div>
@@ -281,11 +309,10 @@
         window.addEventListener('scroll', function() {
             const scrolled = window.scrollY;
             const bg = document.querySelector('.bg-static');
-            // يحرك الصورة ببطء بنسبة 25% من سرعة تمرير الصفحة لتعطي عمقاً وحركة متناسقة
             bg.style.transform = `translateY(-${scrolled * 0.25}px)`;
         });
 
-        // آلية اللغات
+        // آلية اللغات والترجمات المحدثة بالخانات الجديدة
         const translations = {
             ar: {
                 pageTitle: "حجز جلسة - أخصائية نفسية",
@@ -297,10 +324,11 @@
                 labelAge: "العمر *",
                 labelPhone: "رقم الهاتف / واتساب *",
                 labelEmail: "البريد الإلكتروني",
+                labelLocation: "موقع السكن (البلد، المدينة، الولاية)",
                 labelSessionType: "نوع الجلسة *",
                 optionOnline: "أونلاين عبر الواتساب",
                 optionInPerson: "حضوري",
-                labelDetails: "وصف مختصر للصعوبة أو الطلب الحالي *",
+                labelDetails: "وصف مختصر للصعوبة أو الطلب الحالي",
                 btnSubmit: "إرسال طلب الحجز"
             },
             en: {
@@ -313,10 +341,11 @@
                 labelAge: "Age *",
                 labelPhone: "Phone Number / WhatsApp *",
                 labelEmail: "Email",
+                labelLocation: "Place of Residence (Country, City, State)",
                 labelSessionType: "Session Type *",
                 optionOnline: "Online via WhatsApp",
                 optionInPerson: "In-Person",
-                labelDetails: "Brief description of the difficulty or current request *",
+                labelDetails: "Brief description of the difficulty or current request",
                 btnSubmit: "Submit Booking Request"
             },
             fr: {
@@ -329,10 +358,11 @@
                 labelAge: "Âge *",
                 labelPhone: "Numéro de téléphone / WhatsApp *",
                 labelEmail: "E-mail",
+                labelLocation: "Lieu de résidence (Pays, Ville, État)",
                 labelSessionType: "Type de séance *",
                 optionOnline: "En ligne (WhatsApp)",
                 optionInPerson: "Présentiel",
-                labelDetails: "Brève description de la difficulté ou de la demande *",
+                labelDetails: "Brève description de la difficulté ou de la demande",
                 btnSubmit: "Envoyer ma demande"
             },
             es: {
@@ -345,14 +375,16 @@
                 labelAge: "Edad *",
                 labelPhone: "Número de teléfono / WhatsApp *",
                 labelEmail: "Correo electrónico",
+                labelLocation: "Lugar de residencia (País, Ciudad, Estado/Provincia)",
                 labelSessionType: "Tipo de sesión *",
                 optionOnline: "En línea (WhatsApp)",
                 optionInPerson: "Presencial",
-                labelDetails: "Breve descripción de la dificultad o solicitud *",
+                labelDetails: "Breve descripción de la dificultad o solicitud",
                 btnSubmit: "Enviar solicitud de reserva"
             }
         };
 
+        // دالة تغيير اللغة
         function changeLanguage(lang) {
             if (lang === 'ar') {
                 document.documentElement.setAttribute('dir', 'rtl');
@@ -360,6 +392,7 @@
                 document.documentElement.setAttribute('dir', 'ltr');
             }
             document.documentElement.setAttribute('lang', lang);
+            document.querySelector('.lang-select').value = lang;
 
             const elements = document.querySelectorAll('[data-i18n]');
             elements.forEach(el => {
@@ -369,6 +402,19 @@
                 }
             });
         }
+
+        // كشف لغة الجهاز تلقائياً عند تحميل الصفحة
+        document.addEventListener("DOMContentLoaded", function() {
+            // جلب لغة المتصفح (مثلاً 'ar', 'en-US', 'fr-FR') وأخذ أول حرفين
+            const userLang = (navigator.language || navigator.userLanguage).substring(0, 2).toLowerCase();
+            const supportedLangs = ['ar', 'en', 'fr', 'es'];
+            
+            // إذا كانت لغة المتصفح مدعومة نستخدمها، وإذا لم تكن نستخدم الفرنسية افتراضياً
+            const finalLang = supportedLangs.includes(userLang) ? userLang : 'fr';
+            
+            // تطبيق اللغة
+            changeLanguage(finalLang);
+        });
     </script>
 </body>
 </html>
