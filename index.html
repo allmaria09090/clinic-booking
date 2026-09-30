@@ -14,6 +14,8 @@
             --card-bg: rgba(255, 255, 255, 0.92);
             --success-bg: #eaf4ed;
             --success-text: #2d6a4f;
+            --creamy-bg: #fdf7f0; /* اللون الكريمي الهادئ لقائمة الشروط */
+            --creamy-border: #f3e8d9;
         }
 
         * {
@@ -65,6 +67,7 @@
             z-index: 1;
         }
 
+        /* شريط اللغة أصبح خارج الحاويات ليكون مرئياً دائماً */
         .top-bar {
             display: flex;
             justify-content: flex-end;
@@ -94,6 +97,86 @@
             transform: translateY(-1px);
         }
 
+        /* تنسيق قائمة الشروط (اللون الكريمي) */
+        .terms-section {
+            background: var(--creamy-bg);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--creamy-border);
+            margin-bottom: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .terms-section h2 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-top: 0;
+            font-size: 1.8em;
+        }
+
+        .terms-section .terms-intro {
+            text-align: center;
+            font-size: 1.1em;
+            color: #6d5b5a;
+            margin-bottom: 30px;
+        }
+
+        .terms-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .term-item {
+            background: rgba(255, 255, 255, 0.5);
+            padding: 15px 20px;
+            border-radius: 12px;
+            border-right: 4px solid var(--primary-color); /* شريط جانبي للتنسيق */
+            line-height: 1.6;
+        }
+
+        html[dir="ltr"] .term-item {
+            border-right: none;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .term-item strong {
+            color: var(--primary-color);
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1.05em;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--creamy-border);
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            accent-color: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            font-size: 1.05em;
+            font-weight: 600;
+            color: #4a3f3e;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* تنسيقات واجهة الحجز العادية */
         .hero {
             text-align: center;
             padding: 45px 25px;
@@ -132,13 +215,6 @@
             font-size: 1.7em;
         }
 
-        .booking-section .section-desc {
-            text-align: center;
-            margin-bottom: 35px;
-            color: #7a6a69;
-            font-size: 1.05em;
-        }
-
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -171,6 +247,16 @@
 
         .hidden {
             display: none !important;
+        }
+
+        /* حركة التلاشي */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease forwards;
         }
 
         .form-group input, 
@@ -231,15 +317,14 @@
             box-shadow: 0 10px 24px rgba(156, 111, 112, 0.35);
         }
 
-        /* تنسيق الزر المعطل بعد الإرسال */
         .submit-btn:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
+            background-color: #a78f90;
         }
 
-        /* رسالة النجاح */
         .success-message {
             display: none;
             background-color: var(--success-bg);
@@ -254,19 +339,10 @@
         }
 
         @media (max-width: 650px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-                gap: 0;
-            }
-            .booking-section {
-                padding: 25px 20px;
-            }
-            .hero {
-                padding: 30px 15px;
-            }
-            .hero h1 {
-                font-size: 1.5em;
-            }
+            .form-grid { grid-template-columns: 1fr; gap: 0; }
+            .booking-section, .terms-section { padding: 25px 20px; }
+            .hero { padding: 30px 15px; }
+            .hero h1 { font-size: 1.5em; }
         }
     </style>
 </head>
@@ -276,6 +352,8 @@
     <div class="bg-overlay"></div>
 
     <div class="container">
+        
+        <!-- شريط اللغة (ثابت للجميع) -->
         <div class="top-bar">
             <select class="lang-select" onchange="changeLanguage(this.value)">
                 <option value="fr">Français</option>
@@ -285,91 +363,150 @@
             </select>
         </div>
 
-        <header class="hero">
-            <h1 data-i18n="heroTitle">Bienvenue dans votre espace d'écoute et de bienveillance</h1>
-            <p data-i18n="heroSubtitle">Je vous accompagne avec bienveillance dans la compréhension de vous-même.</p>
-        </header>
-
-        <section class="booking-section">
-            <h2 data-i18n="formTitle">Réserver une séance</h2>
-            <p class="section-desc" data-i18n="formDesc">Veuillez remplir le formulaire ci-dessous. Notre équipe vous contactera pour confirmer votre rendez-vous.</p>
+        <!-- 1. واجهة الشروط والملاحظات (تظهر أولاً) -->
+        <div id="termsContainer" class="terms-section">
+            <h2 data-i18n="termsTitle">ملاحظات مهمة قبل حجز جلستك</h2>
+            <p class="terms-intro" data-i18n="termsIntro">يرجى قراءة النقاط التالية والموافقة عليها قبل إرسال طلب الحجز:</p>
             
-            <form id="bookingForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
-                
-                <!-- شبكة البيانات الشخصية -->
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label><span data-i18n="labelFirstName">Prénom</span><span class="req-mark">*</span></label>
-                        <input type="text" name="first_name" required>
-                    </div>
-                    <div class="form-group">
-                        <label><span data-i18n="labelLastName">Nom</span><span class="req-mark">*</span></label>
-                        <input type="text" name="last_name" required>
-                    </div>
-                    <div class="form-group">
-                        <label><span data-i18n="labelAge">Âge</span><span class="req-mark">*</span></label>
-                        <input type="number" name="age" required>
-                    </div>
-                    <div class="form-group">
-                        <label><span data-i18n="labelPhone">Numéro de téléphone / WhatsApp</span><span class="req-mark">*</span></label>
-                        <input type="tel" name="phone" required>
-                    </div>
+            <div class="terms-list">
+                <div class="term-item">
+                    <strong data-i18n="t1_title">1. تأكيد الموعد</strong>
+                    <span data-i18n="t1_desc">إرسال طلب الحجز لا يعني أن الموعد قد تم تأكيده. سيتصل بك فريقنا لتأكيد الموعد وتزويدك بالتفاصيل اللازمة.</span>
                 </div>
+                <div class="term-item">
+                    <strong data-i18n="t2_title">2. الدفع</strong>
+                    <span data-i18n="t2_desc">الجلسات الأونلاين تُدفع مسبقًا عبر CCP / بطاقة البريد قبل موعد الجلسة. الجلسات الحضورية تُدفع نقدًا في المركز.</span>
+                </div>
+                <div class="term-item">
+                    <strong data-i18n="t3_title">3. الإلغاء</strong>
+                    <span data-i18n="t3_desc">في حال رغبتك في إلغاء الموعد، يُرجى إرسال رسالة إلغاء قبل الجلسة بـ 24 ساعة على الأقل.</span>
+                </div>
+                <div class="term-item">
+                    <strong data-i18n="t4_title">4. عدم الحضور</strong>
+                    <span data-i18n="t4_desc">في حال عدم الحضور إلى جلسة أونلاين دون إبلاغ مسبق، يتم تأجيل الجلسة إلى الأسبوع التالي.</span>
+                </div>
+                <div class="term-item">
+                    <strong data-i18n="t5_title">5. الطوارئ</strong>
+                    <span data-i18n="t5_desc">الجلسات لا تُعد خدمة طوارئ نفسية. في حال وجود خطر فوري على سلامتك أو سلامة شخص آخر، يُرجى التوجه مباشرة إلى أقرب مصلحة استعجالات.</span>
+                </div>
+                <div class="term-item">
+                    <strong data-i18n="t6_title">6. السرية والخصوصية</strong>
+                    <span data-i18n="t6_desc">تُعامل المعلومات التي تقدمها بسرية واحترام، وتُستخدم في إطار تنظيم ومتابعة طلبك وفق القواعد المهنية.</span>
+                </div>
+                <div class="term-item">
+                    <strong data-i18n="t7_title">7. القُصّر</strong>
+                    <span data-i18n="t7_desc">بالنسبة للأشخاص الذين تقل أعمارهم عن السن القانوني، قد تكون موافقة الولي الشرعي مطلوبة وفقًا للإجراءات المعمول بها.</span>
+                </div>
+            </div>
 
-                <!-- شبكة تفاصيل الجلسة -->
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label><span data-i18n="labelSessionType">Type de séance</span><span class="req-mark">*</span></label>
-                        <select name="session_type" required>
-                            <option value="online" data-i18n="optionOnline">En ligne (WhatsApp)</option>
-                            <option value="in_person" data-i18n="optionInPerson">Présentiel</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label><span data-i18n="labelEmail">E-mail</span><span class="optional-text" data-i18n="optional">(Optionnel)</span></label>
-                        <input type="email" name="email">
-                    </div>
-                </div>
+            <label class="checkbox-group">
+                <input type="checkbox" id="agreeCheckbox">
+                <span data-i18n="termsCheckbox">أقر بأنني قرأت هذه الملاحظات وفهمتها وأوافق عليها.</span>
+            </label>
+
+            <button id="btnContinue" class="submit-btn" disabled data-i18n="btnContinue">أوافق وأتابع الحجز</button>
+        </div>
+
+
+        <!-- 2. واجهة الحجز (مخفية في البداية وتظهر بعد الموافقة) -->
+        <div id="bookingContainer" class="hidden">
+            <header class="hero">
+                <h1 data-i18n="heroTitle">Bienvenue dans votre espace d'écoute et de bienveillance</h1>
+                <p data-i18n="heroSubtitle">Je vous accompagne avec bienveillance dans la compréhension de vous-même.</p>
+            </header>
+
+            <section class="booking-section">
+                <h2 data-i18n="formTitle">Réserver une séance</h2>
+                
+                <form id="bookingForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
                     
-                <!-- حقول السكن الديناميكية -->
-                <div class="form-grid">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label><span data-i18n="labelFirstName">Prénom</span><span class="req-mark">*</span></label>
+                            <input type="text" name="first_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label><span data-i18n="labelLastName">Nom</span><span class="req-mark">*</span></label>
+                            <input type="text" name="last_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label><span data-i18n="labelAge">Âge</span><span class="req-mark">*</span></label>
+                            <input type="number" name="age" required>
+                        </div>
+                        <div class="form-group">
+                            <label><span data-i18n="labelPhone">Numéro de téléphone / WhatsApp</span><span class="req-mark">*</span></label>
+                            <input type="tel" name="phone" required>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label><span data-i18n="labelSessionType">Type de séance</span><span class="req-mark">*</span></label>
+                            <select name="session_type" required>
+                                <option value="online" data-i18n="optionOnline">En ligne (WhatsApp)</option>
+                                <option value="in_person" data-i18n="optionInPerson">Présentiel</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><span data-i18n="labelEmail">E-mail</span><span class="optional-text" data-i18n="optional">(Optionnel)</span></label>
+                            <input type="email" name="email">
+                        </div>
+                    </div>
+                        
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label><span data-i18n="labelCountry">Pays</span><span class="optional-text" data-i18n="optional">(Optionnel)</span></label>
+                            <input type="text" name="country" id="countryInput">
+                        </div>
+                        <div class="form-group hidden" id="cityGroup">
+                            <label><span data-i18n="labelCity">Ville</span><span class="optional-text" data-i18n="optional">(Optionnel)</span></label>
+                            <input type="text" name="city" id="cityInput">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group hidden" id="regionGroup">
+                        <label><span data-i18n="labelRegion">État ou Région</span><span class="optional-text" data-i18n="optional">(Optionnel)</span></label>
+                        <input type="text" name="region" id="regionInput">
+                    </div>
+
                     <div class="form-group">
-                        <label><span data-i18n="labelCountry">Pays</span><span class="optional-text" data-i18n="optional">(Optionnel)</span></label>
-                        <input type="text" name="country" id="countryInput">
+                        <label><span data-i18n="labelDetails">Brève description de la difficulté ou de la demande</span><span class="optional-text" data-i18n="optional">(Optionnel)</span></label>
+                        <textarea name="description"></textarea>
                     </div>
-                    <div class="form-group hidden" id="cityGroup">
-                        <label><span data-i18n="labelCity">Ville</span><span class="optional-text" data-i18n="optional">(Optionnel)</span></label>
-                        <input type="text" name="city" id="cityInput">
+
+                    <button type="submit" id="submitBtn" class="submit-btn" data-i18n="btnSubmit">Envoyer ma demande</button>
+                    
+                    <div id="successMessage" class="success-message" data-i18n="successMessage">
+                        Votre demande a été envoyée avec succès. Nous vous contacterons dans les plus brefs délais.
                     </div>
-                </div>
-                
-                <div class="form-group hidden" id="regionGroup">
-                    <label><span data-i18n="labelRegion">État ou Région</span><span class="optional-text" data-i18n="optional">(Optionnel)</span></label>
-                    <input type="text" name="region" id="regionInput">
-                </div>
-
-                <!-- الوصف -->
-                <div class="form-group">
-                    <label><span data-i18n="labelDetails">Brève description de la difficulté ou de la demande</span><span class="optional-text" data-i18n="optional">(Optionnel)</span></label>
-                    <textarea name="description"></textarea>
-                </div>
-
-                <button type="submit" id="submitBtn" class="submit-btn" data-i18n="btnSubmit">Envoyer ma demande</button>
-                
-                <!-- رسالة النجاح (مخفية افتراضياً) -->
-                <div id="successMessage" class="success-message" data-i18n="successMessage">
-                    Votre demande a été envoyée avec succès. Nous vous contacterons dans les plus brefs délais.
-                </div>
-            </form>
-        </section>
+                </form>
+            </section>
+        </div>
     </div>
 
     <script>
-        // تأثير الحركة الانسيابية للخلفية
+        // حركة الخلفية
         window.addEventListener('scroll', function() {
             const scrolled = window.scrollY;
             const bg = document.querySelector('.bg-static');
             bg.style.transform = `translateY(-${scrolled * 0.25}px)`;
+        });
+
+        // منطق الموافقة على الشروط
+        const agreeCheckbox = document.getElementById('agreeCheckbox');
+        const btnContinue = document.getElementById('btnContinue');
+        const termsContainer = document.getElementById('termsContainer');
+        const bookingContainer = document.getElementById('bookingContainer');
+
+        agreeCheckbox.addEventListener('change', function() {
+            btnContinue.disabled = !this.checked;
+        });
+
+        btnContinue.addEventListener('click', function() {
+            termsContainer.classList.add('hidden');
+            bookingContainer.classList.remove('hidden');
+            bookingContainer.classList.add('fade-in');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
         // ديناميكية حقول السكن
@@ -399,31 +536,27 @@
             }
         });
 
-        // التعامل مع زر الإرسال وإظهار رسالة النجاح بدون تحديث الصفحة
+        // الإرسال بالخلفية
         const bookingForm = document.getElementById('bookingForm');
         const submitBtn = document.getElementById('submitBtn');
         const successMessage = document.getElementById('successMessage');
 
         bookingForm.addEventListener('submit', function(e) {
-            e.preventDefault(); // منع انتقال الصفحة
-
-            // تعطيل الزر لتجنب الإرسال المكرر
+            e.preventDefault();
             submitBtn.disabled = true;
             submitBtn.textContent = '...'; 
 
             const formData = new FormData(bookingForm);
             const actionUrl = bookingForm.getAttribute('action');
 
-            // محاكاة الإرسال لإظهار الواجهة في حال لم يتم وضع رابط Formspree بعد
             if(actionUrl.includes('YOUR_FORM_ID')) {
                 setTimeout(() => {
                     successMessage.style.display = 'block';
-                    submitBtn.style.display = 'none'; // إخفاء الزر بعد النجاح
+                    submitBtn.style.display = 'none';
                 }, 800);
                 return;
             }
 
-            // الإرسال الفعلي لـ Formspree
             fetch(actionUrl, {
                 method: 'POST',
                 body: formData,
@@ -431,11 +564,11 @@
             }).then(response => {
                 if (response.ok) {
                     successMessage.style.display = 'block';
-                    submitBtn.style.display = 'none'; // إخفاء الزر بعد النجاح
+                    submitBtn.style.display = 'none';
                 } else {
                     alert("عذراً، حدث خطأ. يرجى المحاولة مرة أخرى.");
                     submitBtn.disabled = false;
-                    changeLanguage(document.documentElement.lang); // إعادة نص الزر للغته
+                    changeLanguage(document.documentElement.lang);
                 }
             }).catch(error => {
                 alert("تعذر الاتصال، تأكد من الإنترنت وحاول مجدداً.");
@@ -444,14 +577,35 @@
             });
         });
 
-        // القاموس الشامل
+        // القاموس الشامل يشمل الشروط
         const translations = {
             ar: {
                 pageTitle: "حجز جلسة - أخصائية نفسية",
+                
+                // الشروط
+                termsTitle: "ملاحظات مهمة قبل حجز جلستك",
+                termsIntro: "يرجى قراءة النقاط التالية والموافقة عليها قبل إرسال طلب الحجز:",
+                t1_title: "1. تأكيد الموعد",
+                t1_desc: "إرسال طلب الحجز لا يعني أن الموعد قد تم تأكيده. سيتصل بك فريقنا لتأكيد الموعد وتزويدك بالتفاصيل اللازمة.",
+                t2_title: "2. الدفع",
+                t2_desc: "الجلسات الأونلاين تُدفع مسبقًا عبر CCP / بطاقة البريد قبل موعد الجلسة. الجلسات الحضورية تُدفع نقدًا في المركز.",
+                t3_title: "3. الإلغاء",
+                t3_desc: "في حال رغبتك في إلغاء الموعد، يُرجى إرسال رسالة إلغاء قبل الجلسة بـ 24 ساعة على الأقل.",
+                t4_title: "4. عدم الحضور",
+                t4_desc: "في حال عدم الحضور إلى جلسة أونلاين دون إبلاغ مسبق، يتم تأجيل الجلسة إلى الأسبوع التالي.",
+                t5_title: "5. الطوارئ",
+                t5_desc: "الجلسات لا تُعد خدمة طوارئ نفسية. في حال وجود خطر فوري على سلامتك أو سلامة شخص آخر، يُرجى التوجه مباشرة إلى أقرب مصلحة استعجالات.",
+                t6_title: "6. السرية والخصوصية",
+                t6_desc: "تُعامل المعلومات التي تقدمها بسرية واحترام، وتُستخدم في إطار تنظيم ومتابعة طلبك وفق القواعد المهنية.",
+                t7_title: "7. القُصّر",
+                t7_desc: "بالنسبة للأشخاص الذين تقل أعمارهم عن السن القانوني، قد تكون موافقة الولي الشرعي مطلوبة وفقًا للإجراءات المعمول بها.",
+                termsCheckbox: "أقر بأنني قرأت هذه الملاحظات وفهمتها وأوافق عليها.",
+                btnContinue: "[ أوافق وأتابع الحجز ]",
+
+                // الفورم
                 heroTitle: "أهلاً بك في فضائك الآمن للاستماع والدعم",
                 heroSubtitle: "أرافقك بكل لطف في فهم نفسك وما تمر به.",
                 formTitle: "حجز جلسة",
-                formDesc: "يُرجى تعبئة الاستمارة أدناه لإرسال طلب الحجز، وسيتصل بكم فريقنا لتأكيد حجزكم.",
                 labelFirstName: "الاسم",
                 labelLastName: "اللقب",
                 labelAge: "العمر",
@@ -470,14 +624,31 @@
             },
             en: {
                 pageTitle: "Book a Session - Psychologist",
+                termsTitle: "Important Notes Before Booking",
+                termsIntro: "Please read and agree to the following points before submitting your request:",
+                t1_title: "1. Confirmation",
+                t1_desc: "Submitting a request does not confirm the appointment. Our team will contact you with details.",
+                t2_title: "2. Payment",
+                t2_desc: "Online sessions are paid in advance via CCP/Postal Card. In-person sessions are paid in cash at the center.",
+                t3_title: "3. Cancellation",
+                t3_desc: "To cancel, please send a message at least 24 hours before the session.",
+                t4_title: "4. No-Show",
+                t4_desc: "Missing an online session without prior notice postpones it to the following week.",
+                t5_title: "5. Emergencies",
+                t5_desc: "Sessions are not emergency services. In case of immediate risk, please visit the nearest emergency room.",
+                t6_title: "6. Privacy",
+                t6_desc: "Your information is treated with strict confidentiality according to professional rules.",
+                t7_title: "7. Minors",
+                t7_desc: "For individuals under legal age, guardian consent may be required.",
+                termsCheckbox: "I acknowledge that I have read, understood, and agree to these notes.",
+                btnContinue: "[ I Agree & Continue ]",
                 heroTitle: "Welcome to your safe space for listening and support",
-                heroSubtitle: "I gently accompany you in understanding yourself and what you are going through.",
+                heroSubtitle: "I gently accompany you in understanding yourself.",
                 formTitle: "Book a Session",
-                formDesc: "Please fill out the form below to submit your booking request. Our team will contact you to confirm.",
                 labelFirstName: "First Name",
                 labelLastName: "Last Name",
                 labelAge: "Age",
-                labelPhone: "Phone Number / WhatsApp",
+                labelPhone: "Phone / WhatsApp",
                 labelSessionType: "Session Type",
                 optionOnline: "Online via WhatsApp",
                 optionInPerson: "In-Person",
@@ -485,21 +656,38 @@
                 labelCountry: "Country",
                 labelCity: "City",
                 labelRegion: "State or Region",
-                labelDetails: "Brief description of the difficulty or current request",
-                btnSubmit: "Submit Booking Request",
+                labelDetails: "Brief description of the difficulty",
+                btnSubmit: "Submit Request",
                 optional: "(Optional)",
-                successMessage: "Your request has been sent successfully. We will contact you as soon as possible."
+                successMessage: "Your request has been sent successfully. We will contact you soon."
             },
             fr: {
                 pageTitle: "Réserver une séance - Psychologue",
+                termsTitle: "Notes importantes avant de réserver",
+                termsIntro: "Veuillez lire et accepter les points suivants avant de soumettre votre demande :",
+                t1_title: "1. Confirmation",
+                t1_desc: "Soumettre une demande ne confirme pas le rendez-vous. Notre équipe vous contactera.",
+                t2_title: "2. Paiement",
+                t2_desc: "Séances en ligne payées d'avance par CCP. Séances en présentiel payées en espèces au cabinet.",
+                t3_title: "3. Annulation",
+                t3_desc: "Veuillez envoyer un message au moins 24h avant la séance pour annuler.",
+                t4_title: "4. Absence",
+                t4_desc: "Une absence sans préavis reporte la séance à la semaine suivante.",
+                t5_title: "5. Urgences",
+                t5_desc: "Ceci n'est pas un service d'urgence. En cas de danger immédiat, allez aux urgences.",
+                t6_title: "6. Confidentialité",
+                t6_desc: "Vos informations sont traitées de manière strictement confidentielle.",
+                t7_title: "7. Mineurs",
+                t7_desc: "Pour les mineurs, le consentement du tuteur légal peut être requis.",
+                termsCheckbox: "Je reconnais avoir lu, compris et accepté ces notes.",
+                btnContinue: "[ J'accepte et je continue ]",
                 heroTitle: "Bienvenue dans votre espace d'écoute et de bienveillance",
                 heroSubtitle: "Je vous accompagne avec bienveillance dans la compréhension de vous-même.",
                 formTitle: "Réserver une séance",
-                formDesc: "Veuillez remplir le formulaire ci-dessous. Notre équipe vous contactera pour confirmer votre rendez-vous.",
                 labelFirstName: "Prénom",
                 labelLastName: "Nom",
                 labelAge: "Âge",
-                labelPhone: "Numéro de téléphone / WhatsApp",
+                labelPhone: "Téléphone / WhatsApp",
                 labelSessionType: "Type de séance",
                 optionOnline: "En ligne (WhatsApp)",
                 optionInPerson: "Présentiel",
@@ -507,32 +695,49 @@
                 labelCountry: "Pays",
                 labelCity: "Ville",
                 labelRegion: "État ou Région",
-                labelDetails: "Brève description de la difficulté ou de la demande",
+                labelDetails: "Brève description de la difficulté",
                 btnSubmit: "Envoyer ma demande",
                 optional: "(Optionnel)",
-                successMessage: "Votre demande a été envoyée avec succès. Nous vous contacterons dans les plus brefs délais."
+                successMessage: "Votre demande a été envoyée avec succès. Nous vous contacterons bientôt."
             },
             es: {
-                pageTitle: "Reservar una sesión - Psicóloga",
+                pageTitle: "Reservar sesión - Psicóloga",
+                termsTitle: "Notas importantes antes de reservar",
+                termsIntro: "Lea y acepte los siguientes puntos antes de enviar su solicitud:",
+                t1_title: "1. Confirmación",
+                t1_desc: "Enviar una solicitud no confirma la cita. Nuestro equipo lo contactará.",
+                t2_title: "2. Pago",
+                t2_desc: "Sesiones en línea pagadas por adelantado vía CCP. Presenciales en efectivo en el centro.",
+                t3_title: "3. Cancelación",
+                t3_desc: "Envíe un mensaje con al menos 24h de antelación para cancelar.",
+                t4_title: "4. Ausencia",
+                t4_desc: "La ausencia sin previo aviso pospone la sesión a la semana siguiente.",
+                t5_title: "5. Emergencias",
+                t5_desc: "No es un servicio de emergencia. En caso de riesgo, acuda a urgencias.",
+                t6_title: "6. Confidencialidad",
+                t6_desc: "Su información es tratada con estricta confidencialidad.",
+                t7_title: "7. Menores",
+                t7_desc: "Para menores, se puede requerir el consentimiento del tutor legal.",
+                termsCheckbox: "Reconozco que he leído, entendido y acepto estas notas.",
+                btnContinue: "[ Acepto y continúo ]",
                 heroTitle: "Bienvenido a tu espacio seguro de escucha y apoyo",
-                heroSubtitle: "Te acompaño con amabilidad a comprenderte a ti mismo y lo que estás pasando.",
+                heroSubtitle: "Te acompaño con amabilidad a comprenderte a ti mismo.",
                 formTitle: "Reservar una sesión",
-                formDesc: "Complete el siguiente formulario. Nuestro equipo se comunicará con usted para confirmar su cita.",
                 labelFirstName: "Nombre",
                 labelLastName: "Apellido",
                 labelAge: "Edad",
-                labelPhone: "Número de teléfono / WhatsApp",
+                labelPhone: "Teléfono / WhatsApp",
                 labelSessionType: "Tipo de sesión",
                 optionOnline: "En línea (WhatsApp)",
                 optionInPerson: "Presencial",
-                labelEmail: "Correo electrónico",
+                labelEmail: "Correo",
                 labelCountry: "País",
                 labelCity: "Ciudad",
-                labelRegion: "Estado o Región",
-                labelDetails: "Breve descripción de la dificultad o solicitud",
-                btnSubmit: "Enviar solicitud de reserva",
+                labelRegion: "Estado",
+                labelDetails: "Breve descripción de la dificultad",
+                btnSubmit: "Enviar solicitud",
                 optional: "(Opcional)",
-                successMessage: "Su solicitud ha sido enviada con éxito. Nos pondremos en contacto con usted lo antes posible."
+                successMessage: "Su solicitud ha sido enviada con éxito. Nos contactaremos pronto."
             }
         };
 
