@@ -9,10 +9,12 @@
     <!-- مكتبات Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <!-- مكتبة تحميل الـ PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
         body { font-family: 'Cairo', sans-serif; background-color: #fcf9f8; margin: 0; padding: 20px; color: #4a3f3e; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); overflow-x: auto;}
+        .container { max-width: 1300px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); overflow-x: auto;}
         h1 { color: #9c6f70; text-align: center; border-bottom: 2px solid #f3e8d9; padding-bottom: 15px; }
         
         #loginScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #9c6f70; display: flex; justify-content: center; align-items: center; z-index: 1000; }
@@ -20,15 +22,26 @@
         .login-box input { width: 100%; padding: 12px; margin: 15px 0; border: 1.5px solid #ecdcdb; border-radius: 8px; font-family: 'Cairo'; text-align: center; font-size: 1.1em;}
         .login-box button { background: #9c6f70; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; width: 100%; font-size: 1.1em;}
         
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; min-width: 900px; }
-        th, td { border: 1px solid #ecdcdb; padding: 12px; text-align: right; }
-        th { background-color: #fdf7f0; color: #9c6f70; }
+        /* شريط البحث المطور */
+        .search-container { margin: 20px 0; }
+        #searchInput { width: 100%; padding: 15px 20px; border-radius: 10px; border: 1.5px solid #ecdcdb; font-family: 'Cairo'; font-size: 1.05em; outline: none; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.02);}
+        #searchInput:focus { border-color: #9c6f70; box-shadow: 0 4px 15px rgba(156, 111, 112, 0.15);}
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 1100px; }
+        th, td { border: 1px solid #ecdcdb; padding: 10px; text-align: right; vertical-align: top;}
+        th { background-color: #fdf7f0; color: #9c6f70; position: sticky; top: 0; z-index: 10; }
         tr:hover { background-color: #fcf9f8; }
         
-        select.status-dropdown { padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-family: 'Cairo'; font-weight: bold; cursor: pointer; width: 100%;}
+        select.status-dropdown { padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-family: 'Cairo'; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 10px;}
         .status-red { background-color: #ffeaea; color: #d32f2f; }
         .status-green { background-color: #eaf4ed; color: #2d6a4f; }
         .status-grey { background-color: #f0f0f0; color: #666; }
+
+        /* حقل الملاحظات وزر الـ PDF */
+        .notes-input { width: 100%; height: 75px; font-family: 'Cairo'; border: 1px dashed #ccc; border-radius: 6px; padding: 8px; resize: vertical; background: #fffaf5;}
+        .notes-input:focus { border-style: solid; border-color: #9c6f70; outline: none; background: #fff;}
+        .pdf-btn { background-color: #4a3f3e; color: white; padding: 8px 10px; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; width: 100%; transition: background-color 0.3s; display: flex; align-items: center; justify-content: center; gap: 5px;}
+        .pdf-btn:hover { background-color: #2c2524; }
     </style>
 </head>
 <body>
@@ -46,28 +59,37 @@
     <!-- لوحة التحكم -->
     <div class="container" id="adminPanel" style="display: none;">
         <h1>لوحة تحكم الحجوزات 📋</h1>
+        
+        <!-- مربع البحث السريع -->
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="🔍 ابحث بالاسم، الهاتف، الحالة، المحافظة، أو أي كلمة في الملاحظات...">
+        </div>
+
         <table>
             <thead>
                 <tr>
-                    <th>تاريخ الطلب</th>
-                    <th>الاسم واللقب</th>
-                    <th>العمر</th>
-                    <th>رقم الهاتف</th>
-                    <th>نوع الجلسة</th>
-                    <th>الموقع</th>
-                    <th>التفاصيل</th>
-                    <th>حالة الطلب</th>
+                    <th width="10%">التاريخ</th>
+                    <th width="15%">الاسم والعمر</th>
+                    <th width="12%">الهاتف</th>
+                    <th width="10%">النوع والموقع</th>
+                    <th width="20%">وصف الحالة</th>
+                    <th width="20%">ملاحظات الأخصائية</th>
+                    <th width="13%">الحالة / الإجراء</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
-                <!-- سيتم الجلب هنا -->
+                <!-- سيتم الجلب هنا بذكاء (Lazy Load) -->
             </tbody>
         </table>
     </div>
 
     <script>
-        // تم تغيير رمز الدخول إلى 2025 بناءً على طلبك
         const SECRET_PASSWORD = "2025"; 
+        
+        // المتغيرات الخاصة بالبحث والتحميل الذكي
+        let allBookings = []; // لتخزين جميع البيانات
+        let filteredBookings = []; // لتخزين البيانات بعد البحث
+        let renderLimit = 20; // عرض 20 حالة فقط مبدئياً لمنع ثقل الصفحة
 
         function checkPassword() {
             if (document.getElementById('adminPass').value === SECRET_PASSWORD) {
@@ -79,13 +101,11 @@
             }
         }
 
-        // تفعيل تسجيل الدخول عند الضغط على زر Enter
         document.getElementById('adminPass').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                checkPassword();
-            }
+            if (e.key === 'Enter') checkPassword();
         });
 
+        // إعدادات Firebase الخاصة بك
         const firebaseConfig = {
             apiKey: "AIzaSyA7R_QtuHcNVKPS82JH4eQmLy1ay6UYBJY",
             authDomain: "maria-clinic.firebaseapp.com",
@@ -97,46 +117,88 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        // 1. جلب البيانات من Firebase
         function fetchData() {
-            const tableBody = document.getElementById('tableBody');
-            
             db.collection("bookings").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
-                tableBody.innerHTML = ""; 
+                allBookings = [];
                 querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    
-                    let dateStr = "الآن";
-                    if(data.timestamp) {
-                        const date = data.timestamp.toDate();
-                        dateStr = date.toLocaleDateString('ar-EG') + "<br>" + date.toLocaleTimeString('ar-EG');
-                    }
-
-                    let statusClass = "status-red";
-                    if(data.status.includes("تم الرد")) statusClass = "status-green";
-                    if(data.status.includes("ملغى")) statusClass = "status-grey";
-
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td dir="ltr" style="text-align: right;">${dateStr}</td>
-                        <td>${data.firstName} ${data.lastName}</td>
-                        <td>${data.age}</td>
-                        <td dir="ltr" style="text-align: right;">${data.phone}</td>
-                        <td>${data.sessionType === 'online' ? 'أونلاين' : 'حضوري'}</td>
-                        <td>${data.country}<br>${data.city}</td>
-                        <td><textarea readonly style="width:100%; height:60px; font-family:Cairo; border:none; resize:none;">${data.description}</textarea></td>
-                        <td>
-                            <select class="status-dropdown ${statusClass}" onchange="updateStatus('${doc.id}', this)">
-                                <option value="🔴 لم يتم الرد" ${data.status === '🔴 لم يتم الرد' ? 'selected' : ''}>🔴 لم يتم الرد</option>
-                                <option value="🟢 تم الرد" ${data.status === '🟢 تم الرد' ? 'selected' : ''}>🟢 تم الرد</option>
-                                <option value="⚪ ملغى" ${data.status === '⚪ ملغى' ? 'selected' : ''}>⚪ ملغى</option>
-                            </select>
-                        </td>
-                    `;
-                    tableBody.appendChild(tr);
+                    allBookings.push({ id: doc.id, ...doc.data() });
                 });
+                // عند التحديث، أعد فلترة البيانات بناءً على ما هو مكتوب في مربع البحث
+                triggerSearch();
             });
         }
 
+        // 2. تحديث الجدول (Lazy Loading / Rendering)
+        function renderTable() {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = ""; 
+            
+            // نأخذ عدد محدد فقط (renderLimit) من المصفوفة لتسريع المتصفح
+            const dataToRender = filteredBookings.slice(0, renderLimit);
+
+            dataToRender.forEach((data) => {
+                let dateStr = "الآن";
+                if(data.timestamp) {
+                    const date = data.timestamp.toDate();
+                    dateStr = date.toLocaleDateString('ar-EG') + "<br>" + date.toLocaleTimeString('ar-EG');
+                }
+
+                let statusClass = "status-red";
+                if(data.status.includes("تم الرد")) statusClass = "status-green";
+                if(data.status.includes("ملغى")) statusClass = "status-grey";
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td dir="ltr" style="text-align: right; font-size:0.9em;">${dateStr}</td>
+                    <td><strong>${data.firstName} ${data.lastName}</strong><br><span style="color:#777; font-size:0.9em;">العمر: ${data.age}</span></td>
+                    <td dir="ltr" style="text-align: right;"><strong>${data.phone}</strong></td>
+                    <td>${data.sessionType === 'online' ? '🌐 أونلاين' : '🏥 حضوري'}<br><span style="color:#777; font-size:0.85em;">${data.country} / ${data.city}</span></td>
+                    <td><div style="max-height:80px; overflow-y:auto; font-size:0.95em;">${data.description}</div></td>
+                    <td>
+                        <textarea class="notes-input" placeholder="أضفي ملاحظاتك الخاصة هنا..." onblur="updateNotes('${data.id}', this.value)">${data.adminNotes || ''}</textarea>
+                    </td>
+                    <td>
+                        <select class="status-dropdown ${statusClass}" onchange="updateStatus('${data.id}', this)">
+                            <option value="🔴 لم يتم الرد" ${data.status === '🔴 لم يتم الرد' ? 'selected' : ''}>🔴 لم يتم الرد</option>
+                            <option value="🟢 تم الرد" ${data.status === '🟢 تم الرد' ? 'selected' : ''}>🟢 تم الرد</option>
+                            <option value="⚪ ملغى" ${data.status === '⚪ ملغى' ? 'selected' : ''}>⚪ ملغى</option>
+                        </select>
+                        <button class="pdf-btn" onclick="downloadPDF('${data.id}')">📄 تحميل PDF</button>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        // 3. محرك البحث الذكي والفوري
+        document.getElementById('searchInput').addEventListener('input', triggerSearch);
+
+        function triggerSearch() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            filteredBookings = allBookings.filter(b => {
+                // تجميع كل تفاصيل المريض في سطر واحد لتسهيل البحث فيه
+                const allText = `${b.firstName} ${b.lastName} ${b.phone} ${b.age} ${b.country} ${b.city} ${b.region} ${b.description} ${b.adminNotes || ''} ${b.sessionType === 'online' ? 'أونلاين' : 'حضوري'} ${b.status}`.toLowerCase();
+                return allText.includes(searchTerm);
+            });
+            
+            // عند البحث نعيد लिमिट إلى 20 ونرسم الجدول
+            renderLimit = 20; 
+            renderTable();
+        }
+
+        // 4. التحميل الذكي عند النزول للأسفل (Infinite Scroll)
+        window.addEventListener('scroll', () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 50) {
+                if (renderLimit < filteredBookings.length) {
+                    renderLimit += 20; // أضف 20 حالة أخرى عندما يصل لنهاية الصفحة
+                    renderTable();
+                }
+            }
+        });
+
+        // 5. تحديث حالة الطلب
         function updateStatus(docId, selectElement) {
             const newStatus = selectElement.value;
             db.collection("bookings").doc(docId).update({ status: newStatus }).then(() => {
@@ -145,6 +207,67 @@
                 else if(newStatus.includes("ملغى")) selectElement.classList.add("status-grey");
                 else selectElement.classList.add("status-red");
             });
+        }
+
+        // 6. حفظ ملاحظات الأخصائية (يتم الحفظ تلقائياً عند النقر خارج المربع)
+        function updateNotes(docId, notesValue) {
+            db.collection("bookings").doc(docId).update({ adminNotes: notesValue });
+        }
+
+        // 7. تحويل الحالة إلى PDF منظم
+        function downloadPDF(docId) {
+            const data = allBookings.find(b => b.id === docId);
+            if (!data) return;
+
+            let dateStr = "غير محدد";
+            if(data.timestamp) {
+                dateStr = data.timestamp.toDate().toLocaleString('ar-EG');
+            }
+
+            // إنشاء واجهة وهمية مرتبة جداً خلف الكواليس لطباعتها
+            const pdfElement = document.createElement('div');
+            pdfElement.innerHTML = `
+                <div style="padding: 40px; font-family: Arial, sans-serif; direction: rtl; text-align: right; color: #333;">
+                    <h1 style="color: #9c6f70; text-align: center; border-bottom: 2px solid #f3e8d9; padding-bottom: 10px;">سجل حالة المريض - د. ماريا</h1>
+                    
+                    <h3 style="margin-top: 30px; color: #4a3f3e;">البيانات الشخصية</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                        <tr><td style="padding: 10px; border: 1px solid #ddd; background: #fdf7f0; width: 30%;">الاسم واللقب</td><td style="padding: 10px; border: 1px solid #ddd;"><strong>${data.firstName} ${data.lastName}</strong></td></tr>
+                        <tr><td style="padding: 10px; border: 1px solid #ddd; background: #fdf7f0;">العمر</td><td style="padding: 10px; border: 1px solid #ddd;">${data.age} سنة</td></tr>
+                        <tr><td style="padding: 10px; border: 1px solid #ddd; background: #fdf7f0;">رقم الهاتف</td><td dir="ltr" style="padding: 10px; border: 1px solid #ddd; text-align: right;">${data.phone}</td></tr>
+                        <tr><td style="padding: 10px; border: 1px solid #ddd; background: #fdf7f0;">موقع السكن</td><td style="padding: 10px; border: 1px solid #ddd;">${data.country || 'غير محدد'} - ${data.city || ''} - ${data.region || ''}</td></tr>
+                    </table>
+
+                    <h3 style="color: #4a3f3e;">تفاصيل الحجز</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                        <tr><td style="padding: 10px; border: 1px solid #ddd; background: #fdf7f0; width: 30%;">نوع الجلسة</td><td style="padding: 10px; border: 1px solid #ddd;">${data.sessionType === 'online' ? 'أونلاين (WhatsApp)' : 'حضوري'}</td></tr>
+                        <tr><td style="padding: 10px; border: 1px solid #ddd; background: #fdf7f0;">تاريخ الطلب</td><td style="padding: 10px; border: 1px solid #ddd;">${dateStr}</td></tr>
+                        <tr><td style="padding: 10px; border: 1px solid #ddd; background: #fdf7f0;">البريد الإلكتروني</td><td dir="ltr" style="padding: 10px; border: 1px solid #ddd; text-align:right;">${data.email || 'لا يوجد'}</td></tr>
+                    </table>
+
+                    <h3 style="color: #4a3f3e;">وصف الحالة (من المريض)</h3>
+                    <div style="padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #fafafa; min-height: 80px; line-height: 1.6;">
+                        ${data.description || 'لا يوجد وصف'}
+                    </div>
+
+                    <h3 style="color: #4a3f3e; margin-top: 30px;">ملاحظات الأخصائية (د. ماريا)</h3>
+                    <div style="padding: 15px; border: 2px solid #9c6f70; border-radius: 8px; background: #fff; min-height: 120px; line-height: 1.6;">
+                        ${data.adminNotes ? data.adminNotes.replace(/\n/g, '<br>') : 'لا توجد ملاحظات مضافة حتى الآن.'}
+                    </div>
+                </div>
+            `;
+
+            // إعدادات مكتبة التحميل
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: `ملف_حالة_${data.firstName}_${data.lastName}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // تحميل الـ PDF
+            html2pdf().set(opt).from(pdfElement).save();
         }
     </script>
 </body>
