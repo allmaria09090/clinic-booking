@@ -14,7 +14,7 @@
             --card-bg: rgba(255, 255, 255, 0.92);
             --success-bg: #eaf4ed;
             --success-text: #2d6a4f;
-            --creamy-bg: #fdf7f0; /* اللون الكريمي الهادئ لقائمة الشروط */
+            --creamy-bg: #fdf7f0; 
             --creamy-border: #f3e8d9;
         }
 
@@ -67,7 +67,6 @@
             z-index: 1;
         }
 
-        /* شريط اللغة أصبح خارج الحاويات ليكون مرئياً دائماً */
         .top-bar {
             display: flex;
             justify-content: flex-end;
@@ -97,7 +96,6 @@
             transform: translateY(-1px);
         }
 
-        /* تنسيق قائمة الشروط (اللون الكريمي) */
         .terms-section {
             background: var(--creamy-bg);
             padding: 40px;
@@ -133,7 +131,7 @@
             background: rgba(255, 255, 255, 0.5);
             padding: 15px 20px;
             border-radius: 12px;
-            border-right: 4px solid var(--primary-color); /* شريط جانبي للتنسيق */
+            border-right: 4px solid var(--primary-color);
             line-height: 1.6;
         }
 
@@ -176,7 +174,6 @@
             user-select: none;
         }
 
-        /* تنسيقات واجهة الحجز العادية */
         .hero {
             text-align: center;
             padding: 45px 25px;
@@ -249,7 +246,6 @@
             display: none !important;
         }
 
-        /* حركة التلاشي */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -353,9 +349,9 @@
 
     <div class="container">
         
-        <!-- شريط اللغة (ثابت للجميع) -->
+        <!-- شريط اللغة -->
         <div class="top-bar">
-            <select class="lang-select" onchange="changeLanguage(this.value)">
+            <select class="lang-select" id="languageSelector" onchange="changeLanguage(this.value)">
                 <option value="fr">Français</option>
                 <option value="ar">العربية</option>
                 <option value="en">English</option>
@@ -363,7 +359,7 @@
             </select>
         </div>
 
-        <!-- 1. واجهة الشروط والملاحظات (تظهر أولاً) -->
+        <!-- 1. واجهة الشروط والملاحظات -->
         <div id="termsContainer" class="terms-section">
             <h2 data-i18n="termsTitle">ملاحظات مهمة قبل حجز جلستك</h2>
             <p class="terms-intro" data-i18n="termsIntro">يرجى قراءة النقاط التالية والموافقة عليها قبل إرسال طلب الحجز:</p>
@@ -408,7 +404,7 @@
         </div>
 
 
-        <!-- 2. واجهة الحجز (مخفية في البداية وتظهر بعد الموافقة) -->
+        <!-- 2. واجهة الحجز -->
         <div id="bookingContainer" class="hidden">
             <header class="hero">
                 <h1 data-i18n="heroTitle">Bienvenue dans votre espace d'écoute et de bienveillance</h1>
@@ -581,8 +577,6 @@
         const translations = {
             ar: {
                 pageTitle: "حجز جلسة - أخصائية نفسية",
-                
-                // الشروط
                 termsTitle: "ملاحظات مهمة قبل حجز جلستك",
                 termsIntro: "يرجى قراءة النقاط التالية والموافقة عليها قبل إرسال طلب الحجز:",
                 t1_title: "1. تأكيد الموعد",
@@ -601,8 +595,6 @@
                 t7_desc: "بالنسبة للأشخاص الذين تقل أعمارهم عن السن القانوني، قد تكون موافقة الولي الشرعي مطلوبة وفقًا للإجراءات المعمول بها.",
                 termsCheckbox: "أقر بأنني قرأت هذه الملاحظات وفهمتها وأوافق عليها.",
                 btnContinue: "[ أوافق وأتابع الحجز ]",
-
-                // الفورم
                 heroTitle: "أهلاً بك في فضائك الآمن للاستماع والدعم",
                 heroSubtitle: "أرافقك بكل لطف في فهم نفسك وما تمر به.",
                 formTitle: "حجز جلسة",
@@ -741,6 +733,7 @@
             }
         };
 
+        // دالة تغيير اللغة وحفظها في الذاكرة (localStorage)
         function changeLanguage(lang) {
             if (lang === 'ar') {
                 document.documentElement.setAttribute('dir', 'rtl');
@@ -748,7 +741,7 @@
                 document.documentElement.setAttribute('dir', 'ltr');
             }
             document.documentElement.setAttribute('lang', lang);
-            document.querySelector('.lang-select').value = lang;
+            document.getElementById('languageSelector').value = lang;
 
             const elements = document.querySelectorAll('[data-i18n]');
             elements.forEach(el => {
@@ -757,13 +750,32 @@
                     el.textContent = translations[lang][key];
                 }
             });
+
+            // حفظ اختيار المستخدم للزيارات القادمة
+            localStorage.setItem('preferredLang', lang);
         }
 
-        // كشف لغة الجهاز تلقائياً
+        // كشف اللغة عند تحميل الصفحة (تعتمد على الذاكرة أو لغات المتصفح المتعددة)
         document.addEventListener("DOMContentLoaded", function() {
-            const userLang = (navigator.language || navigator.userLanguage).substring(0, 2).toLowerCase();
             const supportedLangs = ['ar', 'en', 'fr', 'es'];
-            const finalLang = supportedLangs.includes(userLang) ? userLang : 'fr';
+            const savedLang = localStorage.getItem('preferredLang');
+            let finalLang = 'fr'; // الفرنسية كافتراضي نهائي
+
+            if (savedLang && supportedLangs.includes(savedLang)) {
+                // إذا كان المستخدم قد اختار لغة سابقاً
+                finalLang = savedLang;
+            } else {
+                // فحص جميع اللغات المفضلة المبرمجة في متصفح الزائر بالترتيب
+                const userLangs = navigator.languages || [navigator.language || navigator.userLanguage];
+                for (let i = 0; i < userLangs.length; i++) {
+                    let langCode = userLangs[i].substring(0, 2).toLowerCase();
+                    if (supportedLangs.includes(langCode)) {
+                        finalLang = langCode;
+                        break;
+                    }
+                }
+            }
+            
             changeLanguage(finalLang);
         });
     </script>
