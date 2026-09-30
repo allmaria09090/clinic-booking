@@ -29,20 +29,21 @@
             overflow-x: hidden;
         }
 
-        /* صورة الخلفية الثابتة */
+        /* صورة الخلفية مع تأثير الحركة الانسيابية */
         .bg-static {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
-            height: 100vh;
+            height: 120vh; /* أطول من الشاشة بقليل لإعطاء مساحة للحركة أثناء التمرير */
             background-image: url('3.jpg');
             background-size: cover;
-            background-position: center;
+            background-position: center top;
             z-index: -2;
+            will-change: transform; /* تحسين الأداء على الهواتف */
         }
 
-        /* طبقة تعتيم لونية هادئة لعزل الصورة وتوضيح النصوص */
+        /* طبقة تعتيم لونية هادئة */
         .bg-overlay {
             position: fixed;
             top: 0;
@@ -215,12 +216,10 @@
 </head>
 <body>
 
-    <!-- تم التعديل لعرض الصورة رقم 3 فقط -->
     <div class="bg-static"></div>
     <div class="bg-overlay"></div>
 
     <div class="container">
-        <!-- شريط تغيير اللغة -->
         <div class="top-bar">
             <select class="lang-select" onchange="changeLanguage(this.value)">
                 <option value="ar">العربية</option>
@@ -278,6 +277,14 @@
     </div>
 
     <script>
+        // تأثير الحركة الانسيابية للخلفية (Parallax Effect)
+        window.addEventListener('scroll', function() {
+            const scrolled = window.scrollY;
+            const bg = document.querySelector('.bg-static');
+            // يحرك الصورة ببطء بنسبة 25% من سرعة تمرير الصفحة لتعطي عمقاً وحركة متناسقة
+            bg.style.transform = `translateY(-${scrolled * 0.25}px)`;
+        });
+
         // آلية اللغات
         const translations = {
             ar: {
