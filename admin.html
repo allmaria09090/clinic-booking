@@ -13,23 +13,29 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        body { font-family: 'Cairo', sans-serif; background-color: #fcf9f8; margin: 0; padding: 20px; color: #4a3f3e; }
-        .container { max-width: 1300px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); overflow-x: auto;}
-        h1 { color: #9c6f70; text-align: center; border-bottom: 2px solid #f3e8d9; padding-bottom: 15px; }
+        /* إعدادات عامة للتجاوب */
+        * { box-sizing: border-box; }
+        body { font-family: 'Cairo', sans-serif; background-color: #fcf9f8; margin: 0; padding: 15px; color: #4a3f3e; }
         
-        #loginScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #9c6f70; display: flex; justify-content: center; align-items: center; z-index: 1000; }
-        .login-box { background: white; padding: 40px; border-radius: 15px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        .login-box input { width: 100%; padding: 12px; margin: 15px 0; border: 1.5px solid #ecdcdb; border-radius: 8px; font-family: 'Cairo'; text-align: center; font-size: 1.1em;}
-        .login-box button { background: #9c6f70; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; width: 100%; font-size: 1.1em;}
+        .container { width: 100%; max-width: 1300px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+        h1 { color: #9c6f70; text-align: center; border-bottom: 2px solid #f3e8d9; padding-bottom: 15px; margin-top: 0; }
+        
+        #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #9c6f70; display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        .login-box { background: white; padding: 40px; border-radius: 15px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 100%; max-width: 400px; }
+        .login-box input { width: 100%; padding: 12px; margin: 15px 0; border: 1.5px solid #ecdcdb; border-radius: 8px; font-family: 'Cairo'; text-align: center; font-size: 1.1em; outline: none; }
+        .login-box button { background: #9c6f70; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; width: 100%; font-size: 1.1em; transition: 0.3s; }
+        .login-box button:hover { background: #835b5c; }
         
         /* شريط البحث المطور */
         .search-container { margin: 20px 0; }
         #searchInput { width: 100%; padding: 15px 20px; border-radius: 10px; border: 1.5px solid #ecdcdb; font-family: 'Cairo'; font-size: 1.05em; outline: none; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.02);}
         #searchInput:focus { border-color: #9c6f70; box-shadow: 0 4px 15px rgba(156, 111, 112, 0.15);}
 
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 1100px; }
-        th, td { border: 1px solid #ecdcdb; padding: 10px; text-align: right; vertical-align: top;}
-        th { background-color: #fdf7f0; color: #9c6f70; position: sticky; top: 0; z-index: 10; }
+        /* تعديلات الجدول ليناسب الهاتف (Table Responsive) */
+        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1050px; /* يحافظ على شكل الخانات من التداخل */ }
+        th, td { border: 1px solid #ecdcdb; padding: 12px 10px; text-align: right; vertical-align: top;}
+        th { background-color: #fdf7f0; color: #9c6f70; position: sticky; top: 0; z-index: 10; font-size: 1.05em; }
         tr:hover { background-color: #fcf9f8; }
         
         select.status-dropdown { padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-family: 'Cairo'; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 10px;}
@@ -38,10 +44,20 @@
         .status-grey { background-color: #f0f0f0; color: #666; }
 
         /* حقل الملاحظات وزر الـ PDF */
-        .notes-input { width: 100%; height: 75px; font-family: 'Cairo'; border: 1px dashed #ccc; border-radius: 6px; padding: 8px; resize: vertical; background: #fffaf5;}
-        .notes-input:focus { border-style: solid; border-color: #9c6f70; outline: none; background: #fff;}
+        .notes-input { width: 100%; height: 75px; font-family: 'Cairo'; border: 1px dashed #ccc; border-radius: 6px; padding: 8px; resize: vertical; background: #fffaf5; outline: none; transition: 0.3s;}
+        .notes-input:focus { border-style: solid; border-color: #9c6f70; background: #fff;}
         .pdf-btn { background-color: #4a3f3e; color: white; padding: 8px 10px; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; width: 100%; transition: background-color 0.3s; display: flex; align-items: center; justify-content: center; gap: 5px;}
         .pdf-btn:hover { background-color: #2c2524; }
+
+        /* أوامر الشاشات الصغيرة (الهواتف) */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .container { padding: 15px; border-radius: 10px; }
+            h1 { font-size: 1.4em; }
+            #searchInput { padding: 12px 15px; font-size: 0.95em; }
+            th, td { padding: 8px; font-size: 0.9em; }
+            .notes-input { height: 60px; font-size: 0.9em; }
+        }
     </style>
 </head>
 <body>
@@ -65,22 +81,25 @@
             <input type="text" id="searchInput" placeholder="🔍 ابحث بالاسم، الهاتف، الحالة، المحافظة، أو أي كلمة في الملاحظات...">
         </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th width="10%">التاريخ</th>
-                    <th width="15%">الاسم والعمر</th>
-                    <th width="12%">الهاتف</th>
-                    <th width="10%">النوع والموقع</th>
-                    <th width="20%">وصف الحالة</th>
-                    <th width="20%">ملاحظات الأخصائية</th>
-                    <th width="13%">الحالة / الإجراء</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                <!-- سيتم الجلب هنا بذكاء (Lazy Load) -->
-            </tbody>
-        </table>
+        <!-- حاوية الجدول المتجاوبة (للهواتف) -->
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="10%">التاريخ</th>
+                        <th width="15%">الاسم والعمر</th>
+                        <th width="12%">الهاتف</th>
+                        <th width="10%">النوع والموقع</th>
+                        <th width="20%">وصف الحالة</th>
+                        <th width="20%">ملاحظات الأخصائية</th>
+                        <th width="13%">الحالة / الإجراء</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- سيتم الجلب هنا بذكاء (Lazy Load) -->
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script>
