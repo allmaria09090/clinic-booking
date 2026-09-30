@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n="pageTitle">Réserver une séance - Psychologue</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- مكتبات Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
     <style>
         :root {
             --primary-color: #9c6f70;
@@ -18,9 +23,7 @@
             --creamy-border: #f3e8d9;
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             font-family: 'Cairo', sans-serif;
@@ -35,303 +38,105 @@
         }
 
         .bg-static {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 120vh;
-            background-image: url('3.jpg');
-            background-size: cover;
-            background-position: center top;
-            z-index: -2;
-            will-change: transform;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 120vh;
+            background-image: url('3.jpg'); background-size: cover; background-position: center top;
+            z-index: -2; will-change: transform;
         }
 
         .bg-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: linear-gradient(135deg, rgba(252, 249, 248, 0.45), rgba(243, 230, 229, 0.40));
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
+            backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
             z-index: -1;
         }
 
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 25px 20px 60px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .top-bar {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 25px;
-        }
-
-        html[dir="ltr"] .top-bar {
-            justify-content: flex-end;
-        }
+        .container { max-width: 900px; margin: 0 auto; padding: 25px 20px 60px; position: relative; z-index: 1; }
+        .top-bar { display: flex; justify-content: flex-end; margin-bottom: 25px; }
+        html[dir="ltr"] .top-bar { justify-content: flex-end; }
 
         .lang-select {
-            padding: 9px 18px;
-            border: 1px solid var(--primary-color);
-            border-radius: 25px;
-            background-color: rgba(255, 255, 255, 0.95);
-            color: var(--primary-color);
-            font-family: 'Cairo', sans-serif;
-            font-weight: 700;
-            cursor: pointer;
-            outline: none;
-            box-shadow: 0 4px 12px rgba(156, 111, 112, 0.12);
-            transition: all 0.3s ease;
+            padding: 9px 18px; border: 1px solid var(--primary-color); border-radius: 25px;
+            background-color: rgba(255, 255, 255, 0.95); color: var(--primary-color);
+            font-family: 'Cairo', sans-serif; font-weight: 700; cursor: pointer; outline: none;
+            box-shadow: 0 4px 12px rgba(156, 111, 112, 0.12); transition: all 0.3s ease;
         }
-
-        .lang-select:hover {
-            background-color: #fff;
-            transform: translateY(-1px);
-        }
+        .lang-select:hover { background-color: #fff; transform: translateY(-1px); }
 
         .terms-section {
-            background: var(--creamy-bg);
-            padding: 40px;
-            border-radius: 24px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
-            border: 1px solid var(--creamy-border);
-            margin-bottom: 20px;
-            animation: fadeIn 0.5s ease;
+            background: var(--creamy-bg); padding: 40px; border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08); border: 1px solid var(--creamy-border);
+            margin-bottom: 20px; animation: fadeIn 0.5s ease;
         }
-
-        .terms-section h2 {
-            color: var(--primary-color);
-            text-align: center;
-            margin-top: 0;
-            font-size: 1.8em;
-        }
-
-        .terms-section .terms-intro {
-            text-align: center;
-            font-size: 1.1em;
-            color: #6d5b5a;
-            margin-bottom: 30px;
-        }
-
-        .terms-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
+        .terms-section h2 { color: var(--primary-color); text-align: center; margin-top: 0; font-size: 1.8em; }
+        .terms-section .terms-intro { text-align: center; font-size: 1.1em; color: #6d5b5a; margin-bottom: 30px; }
+        .terms-list { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; }
         .term-item {
-            background: rgba(255, 255, 255, 0.5);
-            padding: 15px 20px;
-            border-radius: 12px;
-            border-right: 4px solid var(--primary-color);
-            line-height: 1.6;
+            background: rgba(255, 255, 255, 0.5); padding: 15px 20px; border-radius: 12px;
+            border-right: 4px solid var(--primary-color); line-height: 1.6;
         }
-
-        html[dir="ltr"] .term-item {
-            border-right: none;
-            border-left: 4px solid var(--primary-color);
-        }
-
-        .term-item strong {
-            color: var(--primary-color);
-            display: block;
-            margin-bottom: 5px;
-            font-size: 1.05em;
-        }
+        html[dir="ltr"] .term-item { border-right: none; border-left: 4px solid var(--primary-color); }
+        .term-item strong { color: var(--primary-color); display: block; margin-bottom: 5px; font-size: 1.05em; }
 
         .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid var(--creamy-border);
-            margin-bottom: 20px;
-            cursor: pointer;
+            display: flex; align-items: center; gap: 12px; background: #fff; padding: 20px;
+            border-radius: 12px; border: 1px solid var(--creamy-border); margin-bottom: 20px; cursor: pointer;
         }
-
-        .checkbox-group input[type="checkbox"] {
-            width: 22px;
-            height: 22px;
-            accent-color: var(--primary-color);
-            cursor: pointer;
-        }
-
-        .checkbox-group label {
-            font-size: 1.05em;
-            font-weight: 600;
-            color: #4a3f3e;
-            cursor: pointer;
-            user-select: none;
-        }
+        .checkbox-group input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--primary-color); cursor: pointer; }
+        .checkbox-group label { font-size: 1.05em; font-weight: 600; color: #4a3f3e; cursor: pointer; user-select: none; }
 
         .hero {
-            text-align: center;
-            padding: 45px 25px;
-            background-color: var(--secondary-color);
-            border-radius: 24px;
-            margin-bottom: 35px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04);
+            text-align: center; padding: 45px 25px; background-color: var(--secondary-color);
+            border-radius: 24px; margin-bottom: 35px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.6);
         }
-
-        .hero h1 {
-            color: var(--primary-color);
-            margin: 0 0 12px;
-            font-size: 1.9em;
-            line-height: 1.4;
-        }
-
-        .hero p {
-            font-size: 1.15em;
-            color: #6d5b5a;
-            margin: 0;
-        }
+        .hero h1 { color: var(--primary-color); margin: 0 0 12px; font-size: 1.9em; line-height: 1.4; }
+        .hero p { font-size: 1.15em; color: #6d5b5a; margin: 0; }
 
         .booking-section {
-            background: var(--card-bg);
-            padding: 40px;
-            border-radius: 24px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.7);
+            background: var(--card-bg); padding: 40px; border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05); border: 1px solid rgba(255, 255, 255, 0.7);
         }
+        .booking-section h2 { color: var(--primary-color); text-align: center; margin: 0 0 15px; font-size: 1.7em; }
 
-        .booking-section h2 {
-            color: var(--primary-color);
-            text-align: center;
-            margin: 0 0 15px;
-            font-size: 1.7em;
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 22px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #554443; }
+        .req-mark { color: #c48c8e; font-weight: bold; margin: 0 4px; }
+        .optional-text { color: #999999; font-size: 0.85em; font-weight: normal; margin: 0 4px; }
+        .hidden { display: none !important; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.6s ease forwards; }
+
+        .form-group input, .form-group select {
+            width: 100%; padding: 13px 16px; border: 1.5px solid #ecdcdb; border-radius: 12px;
+            font-family: 'Cairo', sans-serif; background-color: rgba(255, 255, 255, 0.85);
+            font-size: 0.95em; color: var(--text-main); transition: border-color 0.25s, box-shadow 0.25s;
         }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 22px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #554443;
-        }
-
-        .req-mark {
-            color: #c48c8e;
-            font-weight: bold;
-            margin: 0 4px;
-        }
-
-        .optional-text {
-            color: #999999;
-            font-size: 0.85em;
-            font-weight: normal;
-            margin: 0 4px;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .fade-in {
-            animation: fadeIn 0.6s ease forwards;
-        }
-
-        .form-group input, 
-        .form-group select {
-            width: 100%;
-            padding: 13px 16px;
-            border: 1.5px solid #ecdcdb;
-            border-radius: 12px;
-            font-family: 'Cairo', sans-serif;
-            background-color: rgba(255, 255, 255, 0.85);
-            font-size: 0.95em;
-            color: var(--text-main);
-            transition: border-color 0.25s, box-shadow 0.25s;
-        }
-
         .form-group textarea {
-            width: 100%;
-            padding: 13px 16px;
-            border: 1.5px solid #ecdcdb;
-            border-radius: 12px;
-            font-family: 'Cairo', sans-serif;
-            background-color: rgba(255, 255, 255, 0.85);
-            font-size: 0.95em;
-            color: var(--text-main);
-            transition: border-color 0.25s, box-shadow 0.25s;
-            resize: none; 
-            height: 160px; 
+            width: 100%; padding: 13px 16px; border: 1.5px solid #ecdcdb; border-radius: 12px;
+            font-family: 'Cairo', sans-serif; background-color: rgba(255, 255, 255, 0.85);
+            font-size: 0.95em; color: var(--text-main); transition: border-color 0.25s, box-shadow 0.25s;
+            resize: none; height: 160px; 
         }
-
-        .form-group input:focus, 
-        .form-group textarea:focus, 
-        .form-group select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            background-color: #ffffff;
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none; border-color: var(--primary-color); background-color: #ffffff;
             box-shadow: 0 0 0 4px rgba(156, 111, 112, 0.12);
         }
 
         .submit-btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 16px 30px;
-            width: 100%;
-            font-size: 1.15em;
-            font-weight: 700;
-            font-family: 'Cairo', sans-serif;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 20px rgba(156, 111, 112, 0.25);
-            margin-top: 10px;
+            background-color: var(--primary-color); color: white; border: none; padding: 16px 30px;
+            width: 100%; font-size: 1.15em; font-weight: 700; font-family: 'Cairo', sans-serif;
+            border-radius: 12px; cursor: pointer; transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(156, 111, 112, 0.25); margin-top: 10px;
         }
-
-        .submit-btn:hover:not(:disabled) {
-            background-color: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 24px rgba(156, 111, 112, 0.35);
-        }
-
-        .submit-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-            background-color: #a78f90;
-        }
+        .submit-btn:hover:not(:disabled) { background-color: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 10px 24px rgba(156, 111, 112, 0.35); }
+        .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; background-color: #a78f90; }
 
         .success-message {
-            display: none;
-            background-color: var(--success-bg);
-            color: var(--success-text);
-            border: 1px solid #c3e6cb;
-            padding: 18px;
-            border-radius: 12px;
-            text-align: center;
-            font-size: 1.05em;
-            font-weight: 600;
-            margin-top: 20px;
+            display: none; background-color: var(--success-bg); color: var(--success-text);
+            border: 1px solid #c3e6cb; padding: 18px; border-radius: 12px; text-align: center;
+            font-size: 1.05em; font-weight: 600; margin-top: 20px;
         }
 
         @media (max-width: 650px) {
@@ -348,7 +153,6 @@
     <div class="bg-overlay"></div>
 
     <div class="container">
-        
         <!-- شريط اللغة -->
         <div class="top-bar">
             <select class="lang-select" id="languageSelector" onchange="changeLanguage(this.value)">
@@ -359,7 +163,7 @@
             </select>
         </div>
 
-        <!-- 1. واجهة الشروط والملاحظات -->
+        <!-- واجهة الشروط والملاحظات -->
         <div id="termsContainer" class="terms-section">
             <h2 data-i18n="termsTitle">Notes importantes avant de réserver</h2>
             <p class="terms-intro" data-i18n="termsIntro">Veuillez lire et accepter les points suivants avant de soumettre votre demande :</p>
@@ -404,7 +208,7 @@
         </div>
 
 
-        <!-- 2. واجهة الحجز -->
+        <!-- واجهة الحجز -->
         <div id="bookingContainer" class="hidden">
             <header class="hero">
                 <h1 data-i18n="heroTitle">Bienvenue dans votre espace d'écoute et de bienveillance</h1>
@@ -414,8 +218,7 @@
             <section class="booking-section">
                 <h2 data-i18n="formTitle">Réserver une séance</h2>
                 
-                <form id="bookingForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
-                    
+                <form id="bookingForm">
                     <div class="form-grid">
                         <div class="form-group">
                             <label><span data-i18n="labelFirstName">Prénom</span><span class="req-mark">*</span></label>
@@ -481,14 +284,30 @@
     </div>
 
     <script>
-        // حركة الخلفية
+        // إعدادات Firebase الخاصة بك
+        const firebaseConfig = {
+            apiKey: "AIzaSyA7R_QtuHcNVKPS82JH4eQmLy1ay6UYBJY",
+            authDomain: "maria-clinic.firebaseapp.com",
+            projectId: "maria-clinic",
+            storageBucket: "maria-clinic.firebasestorage.app",
+            messagingSenderId: "166573964155",
+            appId: "1:166573964155:web:13c1289a3e561b7c1b1bde"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // إعدادات البوت
+        const botToken = "8879067620:AAGNbYKywSvpVN2IDaB7CM0BTGZ0TrXDi5k";
+        const chatId = "7466222599";
+
+        // تأثير الخلفية
         window.addEventListener('scroll', function() {
             const scrolled = window.scrollY;
             const bg = document.querySelector('.bg-static');
             bg.style.transform = `translateY(-${scrolled * 0.25}px)`;
         });
 
-        // منطق الموافقة على الشروط
+        // الشروط
         const agreeCheckbox = document.getElementById('agreeCheckbox');
         const btnContinue = document.getElementById('btnContinue');
         const termsContainer = document.getElementById('termsContainer');
@@ -505,7 +324,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
-        // ديناميكية حقول السكن
+        // ديناميكية المدن
         const countryInput = document.getElementById('countryInput');
         const cityGroup = document.getElementById('cityGroup');
         const cityInput = document.getElementById('cityInput');
@@ -516,23 +335,19 @@
             if(this.value.trim().length > 0) {
                 cityGroup.classList.remove('hidden');
             } else {
-                cityGroup.classList.add('hidden');
-                regionGroup.classList.add('hidden');
-                cityInput.value = '';
-                regionInput.value = '';
+                cityGroup.classList.add('hidden'); regionGroup.classList.add('hidden');
+                cityInput.value = ''; regionInput.value = '';
             }
         });
-
         cityInput.addEventListener('input', function() {
             if(this.value.trim().length > 0) {
                 regionGroup.classList.remove('hidden');
             } else {
-                regionGroup.classList.add('hidden');
-                regionInput.value = '';
+                regionGroup.classList.add('hidden'); regionInput.value = '';
             }
         });
 
-        // الإرسال بالخلفية
+        // حفظ في Firebase وإرسال إشعار تليجرام
         const bookingForm = document.getElementById('bookingForm');
         const submitBtn = document.getElementById('submitBtn');
         const successMessage = document.getElementById('successMessage');
@@ -543,226 +358,138 @@
             submitBtn.textContent = '...'; 
 
             const formData = new FormData(bookingForm);
-            const actionUrl = bookingForm.getAttribute('action');
+            
+            const bookingData = {
+                firstName: formData.get('first_name'),
+                lastName: formData.get('last_name'),
+                age: formData.get('age'),
+                phone: formData.get('phone'),
+                sessionType: formData.get('session_type'),
+                email: formData.get('email') || "لا يوجد",
+                country: formData.get('country') || "",
+                city: formData.get('city') || "",
+                region: formData.get('region') || "",
+                description: formData.get('description') || "لا يوجد",
+                status: "🔴 لم يتم الرد",
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
 
-            if(actionUrl.includes('YOUR_FORM_ID')) {
-                setTimeout(() => {
+            // الحفظ في قاعدة البيانات
+            db.collection("bookings").add(bookingData)
+            .then(() => {
+                // إرسال الإشعار بعد نجاح الحفظ
+                let sessionText = bookingData.sessionType === "online" ? "أونلاين" : "حضوري";
+                let telegramMsg = `🔔 طلب حجز جديد!\n👤 الاسم: ${bookingData.firstName} ${bookingData.lastName}\n📱 الهاتف: ${bookingData.phone}\n🗓 الجلسة: ${sessionText}\n\n🔗 للمعاينة، ادخل للوحة التحكم:\nhttps://dr-maria-labadi.vercel.app/admin.html`;
+                
+                let telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(telegramMsg)}`;
+                
+                fetch(telegramUrl).then(() => {
                     successMessage.style.display = 'block';
                     submitBtn.style.display = 'none';
-                }, 800);
-                return;
-            }
-
-            fetch(actionUrl, {
-                method: 'POST',
-                body: formData,
-                headers: { 'Accept': 'application/json' }
-            }).then(response => {
-                if (response.ok) {
+                }).catch(() => {
+                    // حتى لو فشل إشعار تليجرام، تم حفظ الطلب بنجاح في Firebase
                     successMessage.style.display = 'block';
                     submitBtn.style.display = 'none';
-                } else {
-                    alert("عذراً، حدث خطأ. يرجى المحاولة مرة أخرى.");
-                    submitBtn.disabled = false;
-                    changeLanguage(document.documentElement.lang);
-                }
-            }).catch(error => {
-                alert("تعذر الاتصال، تأكد من الإنترنت وحاول مجدداً.");
+                });
+            })
+            .catch((error) => {
+                console.error("Error adding document: ", error);
+                alert("حدث خطأ أثناء الإرسال، يرجى المحاولة مجدداً.");
                 submitBtn.disabled = false;
                 changeLanguage(document.documentElement.lang);
             });
         });
 
-        // القاموس الشامل يشمل الشروط
         const translations = {
             ar: {
                 pageTitle: "حجز جلسة - أخصائية نفسية",
                 termsTitle: "ملاحظات مهمة قبل حجز جلستك",
                 termsIntro: "يرجى قراءة النقاط التالية والموافقة عليها قبل إرسال طلب الحجز:",
-                t1_title: "1. تأكيد الموعد",
-                t1_desc: "إرسال طلب الحجز لا يعني أن الموعد قد تم تأكيده. سيتصل بك فريقنا لتأكيد الموعد وتزويدك بالتفاصيل اللازمة.",
-                t2_title: "2. الدفع",
-                t2_desc: "الجلسات الأونلاين تُدفع مسبقًا عبر CCP / بطاقة البريد قبل موعد الجلسة. الجلسات الحضورية تُدفع نقدًا في المركز.",
-                t3_title: "3. الإلغاء",
-                t3_desc: "في حال رغبتك في إلغاء الموعد، يُرجى إرسال رسالة إلغاء قبل الجلسة بـ 24 ساعة على الأقل.",
-                t4_title: "4. عدم الحضور",
-                t4_desc: "في حال عدم الحضور إلى جلسة أونلاين دون إبلاغ مسبق، يتم تأجيل الجلسة إلى الأسبوع التالي.",
-                t5_title: "5. الطوارئ",
-                t5_desc: "الجلسات لا تُعد خدمة طوارئ نفسية. في حال وجود خطر فوري على سلامتك أو سلامة شخص آخر، يُرجى التوجه مباشرة إلى أقرب مصلحة استعجالات.",
-                t6_title: "6. السرية والخصوصية",
-                t6_desc: "تُعامل المعلومات التي تقدمها بسرية واحترام، وتُستخدم في إطار تنظيم ومتابعة طلبك وفق القواعد المهنية.",
-                t7_title: "7. القُصّر",
-                t7_desc: "بالنسبة للأشخاص الذين تقل أعمارهم عن السن القانوني، قد تكون موافقة الولي الشرعي مطلوبة وفقًا للإجراءات المعمول بها.",
-                termsCheckbox: "أقر بأنني قرأت هذه الملاحظات وفهمتها وأوافق عليها.",
-                btnContinue: "[ أوافق وأتابع الحجز ]",
-                heroTitle: "أهلاً بك في فضائك الآمن للاستماع والدعم",
-                heroSubtitle: "أرافقك بكل لطف في فهم نفسك وما تمر به.",
-                formTitle: "حجز جلسة",
-                labelFirstName: "الاسم",
-                labelLastName: "اللقب",
-                labelAge: "العمر",
-                labelPhone: "رقم الهاتف / واتساب",
-                labelSessionType: "نوع الجلسة",
-                optionOnline: "أونلاين عبر الواتساب",
-                optionInPerson: "حضوري",
-                labelEmail: "البريد الإلكتروني",
-                labelCountry: "البلد",
-                labelCity: "المدينة",
-                labelRegion: "الولاية أو المنطقة",
-                labelDetails: "وصف مختصر للصعوبة أو الطلب الحالي",
-                btnSubmit: "إرسال طلب الحجز",
-                optional: "(اختياري)",
+                t1_title: "1. تأكيد الموعد", t1_desc: "إرسال طلب الحجز لا يعني أن الموعد قد تم تأكيده. سيتصل بك فريقنا لتأكيد الموعد وتزويدك بالتفاصيل اللازمة.",
+                t2_title: "2. الدفع", t2_desc: "الجلسات الأونلاين تُدفع مسبقًا عبر CCP / بطاقة البريد قبل موعد الجلسة. الجلسات الحضورية تُدفع نقدًا في المركز.",
+                t3_title: "3. الإلغاء", t3_desc: "في حال رغبتك في إلغاء الموعد، يُرجى إرسال رسالة إلغاء قبل الجلسة بـ 24 ساعة على الأقل.",
+                t4_title: "4. عدم الحضور", t4_desc: "في حال عدم الحضور إلى جلسة أونلاين دون إبلاغ مسبق، يتم تأجيل الجلسة إلى الأسبوع التالي.",
+                t5_title: "5. الطوارئ", t5_desc: "الجلسات لا تُعد خدمة طوارئ نفسية. في حال وجود خطر فوري على سلامتك، يُرجى التوجه لمصلحة استعجالات.",
+                t6_title: "6. السرية والخصوصية", t6_desc: "تُعامل المعلومات بسرية واحترام، وتُستخدم في إطار تنظيم ومتابعة طلبك وفق القواعد المهنية.",
+                t7_title: "7. القُصّر", t7_desc: "بالنسبة للأشخاص دون السن القانوني، قد تكون موافقة الولي الشرعي مطلوبة.",
+                termsCheckbox: "أقر بأنني قرأت هذه الملاحظات وفهمتها وأوافق عليها.", btnContinue: "[ أوافق وأتابع الحجز ]",
+                heroTitle: "أهلاً بك في فضائك الآمن للاستماع والدعم", heroSubtitle: "أرافقك بكل لطف في فهم نفسك وما تمر به.",
+                formTitle: "حجز جلسة", labelFirstName: "الاسم", labelLastName: "اللقب", labelAge: "العمر", labelPhone: "رقم الهاتف / واتساب",
+                labelSessionType: "نوع الجلسة", optionOnline: "أونلاين عبر الواتساب", optionInPerson: "حضوري",
+                labelEmail: "البريد الإلكتروني", labelCountry: "البلد", labelCity: "المدينة", labelRegion: "الولاية أو المنطقة",
+                labelDetails: "وصف مختصر للصعوبة أو الطلب الحالي", btnSubmit: "إرسال طلب الحجز", optional: "(اختياري)",
                 successMessage: "تم إرسال طلبك بنجاح. سيتم التواصل معك في أقرب وقت ممكن."
             },
             en: {
-                pageTitle: "Book a Session - Psychologist",
-                termsTitle: "Important Notes Before Booking",
+                pageTitle: "Book a Session - Psychologist", termsTitle: "Important Notes Before Booking",
                 termsIntro: "Please read and agree to the following points before submitting your request:",
-                t1_title: "1. Confirmation",
-                t1_desc: "Submitting a request does not confirm the appointment. Our team will contact you with details.",
-                t2_title: "2. Payment",
-                t2_desc: "Online sessions are paid in advance via CCP/Postal Card. In-person sessions are paid in cash at the center.",
-                t3_title: "3. Cancellation",
-                t3_desc: "To cancel, please send a message at least 24 hours before the session.",
-                t4_title: "4. No-Show",
-                t4_desc: "Missing an online session without prior notice postpones it to the following week.",
-                t5_title: "5. Emergencies",
-                t5_desc: "Sessions are not emergency services. In case of immediate risk, please visit the nearest emergency room.",
-                t6_title: "6. Privacy",
-                t6_desc: "Your information is treated with strict confidentiality according to professional rules.",
-                t7_title: "7. Minors",
-                t7_desc: "For individuals under legal age, guardian consent may be required.",
-                termsCheckbox: "I acknowledge that I have read, understood, and agree to these notes.",
-                btnContinue: "[ I Agree & Continue ]",
-                heroTitle: "Welcome to your safe space for listening and support",
-                heroSubtitle: "I gently accompany you in understanding yourself.",
-                formTitle: "Book a Session",
-                labelFirstName: "First Name",
-                labelLastName: "Last Name",
-                labelAge: "Age",
-                labelPhone: "Phone / WhatsApp",
-                labelSessionType: "Session Type",
-                optionOnline: "Online via WhatsApp",
-                optionInPerson: "In-Person",
-                labelEmail: "Email",
-                labelCountry: "Country",
-                labelCity: "City",
-                labelRegion: "State or Region",
-                labelDetails: "Brief description of the difficulty",
-                btnSubmit: "Submit Request",
-                optional: "(Optional)",
+                t1_title: "1. Confirmation", t1_desc: "Submitting a request does not confirm the appointment.",
+                t2_title: "2. Payment", t2_desc: "Online sessions are paid in advance. In-person paid in cash.",
+                t3_title: "3. Cancellation", t3_desc: "Please send a message at least 24h before to cancel.",
+                t4_title: "4. No-Show", t4_desc: "Missing an online session without prior notice postpones it.",
+                t5_title: "5. Emergencies", t5_desc: "Not an emergency service. Please visit the ER if at risk.",
+                t6_title: "6. Privacy", t6_desc: "Your information is treated with strict confidentiality.",
+                t7_title: "7. Minors", t7_desc: "Guardian consent may be required for minors.",
+                termsCheckbox: "I acknowledge that I have read, understood, and agree to these notes.", btnContinue: "[ I Agree & Continue ]",
+                heroTitle: "Welcome to your safe space for listening and support", heroSubtitle: "I gently accompany you in understanding yourself.",
+                formTitle: "Book a Session", labelFirstName: "First Name", labelLastName: "Last Name", labelAge: "Age", labelPhone: "Phone / WhatsApp",
+                labelSessionType: "Session Type", optionOnline: "Online via WhatsApp", optionInPerson: "In-Person",
+                labelEmail: "Email", labelCountry: "Country", labelCity: "City", labelRegion: "State or Region",
+                labelDetails: "Brief description of the difficulty", btnSubmit: "Submit Request", optional: "(Optional)",
                 successMessage: "Your request has been sent successfully. We will contact you soon."
             },
             fr: {
-                pageTitle: "Réserver une séance - Psychologue",
-                termsTitle: "Notes importantes avant de réserver",
+                pageTitle: "Réserver une séance - Psychologue", termsTitle: "Notes importantes avant de réserver",
                 termsIntro: "Veuillez lire et accepter les points suivants avant de soumettre votre demande :",
-                t1_title: "1. Confirmation",
-                t1_desc: "Soumettre une demande ne confirme pas le rendez-vous. Notre équipe vous contactera.",
-                t2_title: "2. Paiement",
-                t2_desc: "Séances en ligne payées d'avance par CCP. Séances en présentiel payées en espèces au cabinet.",
-                t3_title: "3. Annulation",
-                t3_desc: "Veuillez envoyer un message au moins 24h avant la séance pour annuler.",
-                t4_title: "4. Absence",
-                t4_desc: "Une absence sans préavis reporte la séance à la semaine suivante.",
-                t5_title: "5. Urgences",
-                t5_desc: "Ceci n'est pas un service d'urgence. En cas de danger immédiat, allez aux urgences.",
-                t6_title: "6. Confidentialité",
-                t6_desc: "Vos informations sont traitées de manière strictement confidentielle.",
-                t7_title: "7. Mineurs",
-                t7_desc: "Pour les mineurs, le consentement du tuteur légal peut être requis.",
-                termsCheckbox: "Je reconnais avoir lu, compris et accepté ces notes.",
-                btnContinue: "[ J'accepte et je continue ]",
-                heroTitle: "Bienvenue dans votre espace d'écoute et de bienveillance",
-                heroSubtitle: "Je vous accompagne avec bienveillance dans la compréhension de vous-même.",
-                formTitle: "Réserver une séance",
-                labelFirstName: "Prénom",
-                labelLastName: "Nom",
-                labelAge: "Âge",
-                labelPhone: "Téléphone / WhatsApp",
-                labelSessionType: "Type de séance",
-                optionOnline: "En ligne (WhatsApp)",
-                optionInPerson: "Présentiel",
-                labelEmail: "E-mail",
-                labelCountry: "Pays",
-                labelCity: "Ville",
-                labelRegion: "État ou Région",
-                labelDetails: "Brève description de la difficulté",
-                btnSubmit: "Envoyer ma demande",
-                optional: "(Optionnel)",
+                t1_title: "1. Confirmation", t1_desc: "Soumettre une demande ne confirme pas le rendez-vous.",
+                t2_title: "2. Paiement", t2_desc: "Séances en ligne payées d'avance. Présentiel en espèces.",
+                t3_title: "3. Annulation", t3_desc: "Veuillez prévenir au moins 24h avant la séance pour annuler.",
+                t4_title: "4. Absence", t4_desc: "Une absence sans préavis reporte la séance à la semaine suivante.",
+                t5_title: "5. Urgences", t5_desc: "Ceci n'est pas un service d'urgence. Allez aux urgences en cas de danger.",
+                t6_title: "6. Confidentialité", t6_desc: "Vos informations sont traitées confidentiellement.",
+                t7_title: "7. Mineurs", t7_desc: "Le consentement du tuteur légal peut être requis.",
+                termsCheckbox: "Je reconnais avoir lu, compris et accepté ces notes.", btnContinue: "[ J'accepte et je continue ]",
+                heroTitle: "Bienvenue dans votre espace d'écoute et de bienveillance", heroSubtitle: "Je vous accompagne avec bienveillance dans la compréhension de vous-même.",
+                formTitle: "Réserver une séance", labelFirstName: "Prénom", labelLastName: "Nom", labelAge: "Âge", labelPhone: "Téléphone / WhatsApp",
+                labelSessionType: "Type de séance", optionOnline: "En ligne (WhatsApp)", optionInPerson: "Présentiel",
+                labelEmail: "E-mail", labelCountry: "Pays", labelCity: "Ville", labelRegion: "État ou Région",
+                labelDetails: "Brève description de la difficulté", btnSubmit: "Envoyer ma demande", optional: "(Optionnel)",
                 successMessage: "Votre demande a été envoyée avec succès. Nous vous contacterons bientôt."
             },
             es: {
-                pageTitle: "Reservar sesión - Psicóloga",
-                termsTitle: "Notas importantes antes de reservar",
+                pageTitle: "Reservar sesión - Psicóloga", termsTitle: "Notas importantes antes de reservar",
                 termsIntro: "Lea y acepte los siguientes puntos antes de enviar su solicitud:",
-                t1_title: "1. Confirmación",
-                t1_desc: "Enviar una solicitud no confirma la cita. Nuestro equipo lo contactará.",
-                t2_title: "2. Pago",
-                t2_desc: "Sesiones en línea pagadas por adelantado vía CCP. Presenciales en efectivo en el centro.",
-                t3_title: "3. Cancelación",
-                t3_desc: "Envíe un mensaje con al menos 24h de antelación para cancelar.",
-                t4_title: "4. Ausencia",
-                t4_desc: "La ausencia sin previo aviso pospone la sesión a la semana siguiente.",
-                t5_title: "5. Emergencias",
-                t5_desc: "No es un servicio de emergencia. En caso de riesgo, acuda a urgencias.",
-                t6_title: "6. Confidencialidad",
-                t6_desc: "Su información es tratada con estricta confidencialidad.",
-                t7_title: "7. Menores",
-                t7_desc: "Para menores, se puede requerir el consentimiento del tutor legal.",
-                termsCheckbox: "Reconozco que he leído, entendido y acepto estas notas.",
-                btnContinue: "[ Acepto y continúo ]",
-                heroTitle: "Bienvenido a tu espacio seguro de escucha y apoyo",
-                heroSubtitle: "Te acompaño con amabilidad a comprenderte a ti mismo.",
-                formTitle: "Reservar una sesión",
-                labelFirstName: "Nombre",
-                labelLastName: "Apellido",
-                labelAge: "Edad",
-                labelPhone: "Teléfono / WhatsApp",
-                labelSessionType: "Tipo de sesión",
-                optionOnline: "En línea (WhatsApp)",
-                optionInPerson: "Presencial",
-                labelEmail: "Correo",
-                labelCountry: "País",
-                labelCity: "Ciudad",
-                labelRegion: "Estado",
-                labelDetails: "Breve descripción de la dificultad",
-                btnSubmit: "Enviar solicitud",
-                optional: "(Opcional)",
+                t1_title: "1. Confirmación", t1_desc: "Enviar una solicitud no confirma la cita.",
+                t2_title: "2. Pago", t2_desc: "Sesiones en línea pagadas por adelantado. Presenciales en efectivo.",
+                t3_title: "3. Cancelación", t3_desc: "Envíe un mensaje con al menos 24h de antelación para cancelar.",
+                t4_title: "4. Ausencia", t4_desc: "La ausencia sin previo aviso pospone la sesión.",
+                t5_title: "5. Emergencias", t5_desc: "No es un servicio de emergencia. Acuda a urgencias si hay riesgo.",
+                t6_title: "6. Confidencialidad", t6_desc: "Su información es tratada con estricta confidencialidad.",
+                t7_title: "7. Menores", t7_desc: "Para menores, se puede requerir el consentimiento del tutor legal.",
+                termsCheckbox: "Reconozco que he leído y acepto estas notas.", btnContinue: "[ Acepto y continúo ]",
+                heroTitle: "Bienvenido a tu espacio seguro de escucha y apoyo", heroSubtitle: "Te acompaño con amabilidad a comprenderte a ti mismo.",
+                formTitle: "Reservar una sesión", labelFirstName: "Nombre", labelLastName: "Apellido", labelAge: "Edad", labelPhone: "Teléfono / WhatsApp",
+                labelSessionType: "Tipo de sesión", optionOnline: "En línea (WhatsApp)", optionInPerson: "Presencial",
+                labelEmail: "Correo", labelCountry: "País", labelCity: "Ciudad", labelRegion: "Estado",
+                labelDetails: "Breve descripción", btnSubmit: "Enviar solicitud", optional: "(Opcional)",
                 successMessage: "Su solicitud ha sido enviada con éxito. Nos contactaremos pronto."
             }
         };
 
-        // دالة تغيير اللغة وحفظها في الذاكرة (localStorage)
         function changeLanguage(lang) {
-            if (lang === 'ar') {
-                document.documentElement.setAttribute('dir', 'rtl');
-            } else {
-                document.documentElement.setAttribute('dir', 'ltr');
-            }
+            document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
             document.documentElement.setAttribute('lang', lang);
             document.getElementById('languageSelector').value = lang;
-
-            const elements = document.querySelectorAll('[data-i18n]');
-            elements.forEach(el => {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if (translations[lang] && translations[lang][key]) {
-                    el.textContent = translations[lang][key];
-                }
+                if (translations[lang] && translations[lang][key]) el.textContent = translations[lang][key];
             });
-
-            // حفظ اختيار المستخدم للزيارات القادمة
             localStorage.setItem('preferredLang', lang);
         }
 
-        // تحديد اللغة عند الدخول: إما اللغة المحفوظة أو الفرنسية إجبارياً كافتراضي
         document.addEventListener("DOMContentLoaded", function() {
-            const supportedLangs = ['ar', 'en', 'fr', 'es'];
             const savedLang = localStorage.getItem('preferredLang');
-            
-            // إذا كان المستخدم قد اختار لغة سابقاً نستخدمها، وإلا فـ الفرنسية هي الأساسية دائماً
-            let finalLang = (savedLang && supportedLangs.includes(savedLang)) ? savedLang : 'fr';
-            
+            let finalLang = (savedLang && ['ar', 'en', 'fr', 'es'].includes(savedLang)) ? savedLang : 'fr';
             changeLanguage(finalLang);
         });
     </script>
