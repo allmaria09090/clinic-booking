@@ -29,34 +29,20 @@
             overflow-x: hidden;
         }
 
-        /* طبقات عرض الصور كخلفية متلاشية */
-        .bg-slider {
+        /* صورة الخلفية الثابتة */
+        .bg-static {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            z-index: -2;
-            overflow: hidden;
-        }
-
-        .bg-slide {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            background-image: url('3.jpg');
             background-size: cover;
             background-position: center;
-            opacity: 0;
-            transition: opacity 2s ease-in-out;
+            z-index: -2;
         }
 
-        .bg-slide.active {
-            opacity: 1;
-        }
-
-        /* تم التعديل هنا: تقليل اللون الأبيض وتقليل الضبابية لتوضيح الصور */
+        /* طبقة تعتيم لونية هادئة لعزل الصورة وتوضيح النصوص */
         .bg-overlay {
             position: fixed;
             top: 0;
@@ -229,14 +215,12 @@
 </head>
 <body>
 
-    <div class="bg-slider">
-        <div class="bg-slide active" style="background-image: url('1.jpg');"></div>
-        <div class="bg-slide" style="background-image: url('2.jpg');"></div>
-        <div class="bg-slide" style="background-image: url('3.jpg');"></div>
-    </div>
+    <!-- تم التعديل لعرض الصورة رقم 3 فقط -->
+    <div class="bg-static"></div>
     <div class="bg-overlay"></div>
 
     <div class="container">
+        <!-- شريط تغيير اللغة -->
         <div class="top-bar">
             <select class="lang-select" onchange="changeLanguage(this.value)">
                 <option value="ar">العربية</option>
@@ -294,16 +278,7 @@
     </div>
 
     <script>
-        const slides = document.querySelectorAll('.bg-slide');
-        let currentSlide = 0;
-
-        function nextSlide() {
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (currentSlide + 1) % slides.length;
-            slides[currentSlide].classList.add('active');
-        }
-        setInterval(nextSlide, 7000);
-
+        // آلية اللغات
         const translations = {
             ar: {
                 pageTitle: "حجز جلسة - أخصائية نفسية",
