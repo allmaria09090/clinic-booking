@@ -296,10 +296,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // إعدادات البوت
-        const botToken = "8879067620:AAGNbYKywSvpVN2IDaB7CM0BTGZ0TrXDi5k";
-        const chatId = "7466222599";
-
         // تأثير الخلفية
         window.addEventListener('scroll', function() {
             const scrolled = window.scrollY;
@@ -347,7 +343,7 @@
             }
         });
 
-        // حفظ في Firebase وإرسال إشعار تليجرام
+        // حفظ في Firebase وإرسال إشعار تليجرام بطريقة آمنة عبر Vercel API
         const bookingForm = document.getElementById('bookingForm');
         const submitBtn = document.getElementById('submitBtn');
         const successMessage = document.getElementById('successMessage');
@@ -377,17 +373,21 @@
             // الحفظ في قاعدة البيانات
             db.collection("bookings").add(bookingData)
             .then(() => {
-                // إرسال الإشعار بعد نجاح الحفظ
-                let sessionText = bookingData.sessionType === "online" ? "أونلاين" : "حضوري";
-                let telegramMsg = `🔔 طلب حجز جديد!\n👤 الاسم: ${bookingData.firstName} ${bookingData.lastName}\n📱 الهاتف: ${bookingData.phone}\n🗓 الجلسة: ${sessionText}\n\n🔗 للمعاينة، ادخل للوحة التحكم:\nhttps://dr-maria-labadi.vercel.app/admin.html`;
-                
-                let telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(telegramMsg)}`;
-                
-                fetch(telegramUrl).then(() => {
+                // الاتصال بـ Vercel API المخفي لإرسال رسالة تليجرام بأمان
+                fetch('/api/notify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        firstName: bookingData.firstName,
+                        lastName: bookingData.lastName,
+                        phone: bookingData.phone,
+                        sessionType: bookingData.sessionType
+                    })
+                }).then(() => {
                     successMessage.style.display = 'block';
                     submitBtn.style.display = 'none';
                 }).catch(() => {
-                    // حتى لو فشل إشعار تليجرام، تم حفظ الطلب بنجاح في Firebase
+                    // حتى لو فشل الاتصال بالـ API، نظهر رسالة النجاح للمريض طالما تم الحفظ في Firebase
                     successMessage.style.display = 'block';
                     submitBtn.style.display = 'none';
                 });
