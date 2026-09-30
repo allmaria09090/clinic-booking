@@ -12,6 +12,8 @@
             --secondary-color: rgba(245, 235, 234, 0.88);
             --text-main: #4a3f3e;
             --card-bg: rgba(255, 255, 255, 0.92);
+            --success-bg: #eaf4ed;
+            --success-text: #2d6a4f;
         }
 
         * {
@@ -154,9 +156,8 @@
             color: #554443;
         }
 
-        /* تنسيق علامة الإجباري والاختياري */
         .req-mark {
-            color: #c48c8e; /* لون خفيف عملي ومتناسق */
+            color: #c48c8e;
             font-weight: bold;
             margin: 0 4px;
         }
@@ -168,7 +169,6 @@
             margin: 0 4px;
         }
 
-        /* إخفاء الحقول الديناميكية */
         .hidden {
             display: none !important;
         }
@@ -225,10 +225,32 @@
             margin-top: 10px;
         }
 
-        .submit-btn:hover {
+        .submit-btn:hover:not(:disabled) {
             background-color: var(--primary-hover);
             transform: translateY(-2px);
             box-shadow: 0 10px 24px rgba(156, 111, 112, 0.35);
+        }
+
+        /* تنسيق الزر المعطل بعد الإرسال */
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* رسالة النجاح */
+        .success-message {
+            display: none;
+            background-color: var(--success-bg);
+            color: var(--success-text);
+            border: 1px solid #c3e6cb;
+            padding: 18px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.05em;
+            font-weight: 600;
+            margin-top: 20px;
         }
 
         @media (max-width: 650px) {
@@ -272,12 +294,17 @@
             <h2 data-i18n="formTitle">Réserver une séance</h2>
             <p class="section-desc" data-i18n="formDesc">Veuillez remplir le formulaire ci-dessous. Notre équipe vous contactera pour confirmer votre rendez-vous.</p>
             
-            <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+            <form id="bookingForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+                
+                <!-- شبكة البيانات الشخصية -->
                 <div class="form-grid">
-                    <!-- الحقول الإجبارية -->
                     <div class="form-group">
-                        <label><span data-i18n="labelName">Nom et prénom</span><span class="req-mark">*</span></label>
-                        <input type="text" name="name" required>
+                        <label><span data-i18n="labelFirstName">Prénom</span><span class="req-mark">*</span></label>
+                        <input type="text" name="first_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label><span data-i18n="labelLastName">Nom</span><span class="req-mark">*</span></label>
+                        <input type="text" name="last_name" required>
                     </div>
                     <div class="form-group">
                         <label><span data-i18n="labelAge">Âge</span><span class="req-mark">*</span></label>
@@ -287,6 +314,10 @@
                         <label><span data-i18n="labelPhone">Numéro de téléphone / WhatsApp</span><span class="req-mark">*</span></label>
                         <input type="tel" name="phone" required>
                     </div>
+                </div>
+
+                <!-- شبكة تفاصيل الجلسة -->
+                <div class="form-grid">
                     <div class="form-group">
                         <label><span data-i18n="labelSessionType">Type de séance</span><span class="req-mark">*</span></label>
                         <select name="session_type" required>
@@ -294,14 +325,14 @@
                             <option value="in_person" data-i18n="optionInPerson">Présentiel</option>
                         </select>
                     </div>
-
-                    <!-- الحقول الاختيارية -->
                     <div class="form-group">
                         <label><span data-i18n="labelEmail">E-mail</span><span class="optional-text" data-i18n="optional">(Optionnel)</span></label>
                         <input type="email" name="email">
                     </div>
+                </div>
                     
-                    <!-- حقول السكن الديناميكية -->
+                <!-- حقول السكن الديناميكية -->
+                <div class="form-grid">
                     <div class="form-group">
                         <label><span data-i18n="labelCountry">Pays</span><span class="optional-text" data-i18n="optional">(Optionnel)</span></label>
                         <input type="text" name="country" id="countryInput">
@@ -310,19 +341,25 @@
                         <label><span data-i18n="labelCity">Ville</span><span class="optional-text" data-i18n="optional">(Optionnel)</span></label>
                         <input type="text" name="city" id="cityInput">
                     </div>
-                    <div class="form-group hidden" id="regionGroup">
-                        <label><span data-i18n="labelRegion">État ou Région</span><span class="optional-text" data-i18n="optional">(Optionnel)</span></label>
-                        <input type="text" name="region" id="regionInput">
-                    </div>
+                </div>
+                
+                <div class="form-group hidden" id="regionGroup">
+                    <label><span data-i18n="labelRegion">État ou Région</span><span class="optional-text" data-i18n="optional">(Optionnel)</span></label>
+                    <input type="text" name="region" id="regionInput">
                 </div>
 
-                <!-- الوصف (خارج الشبكة ليكون بعرض الشاشة الكامل) -->
+                <!-- الوصف -->
                 <div class="form-group">
                     <label><span data-i18n="labelDetails">Brève description de la difficulté ou de la demande</span><span class="optional-text" data-i18n="optional">(Optionnel)</span></label>
                     <textarea name="description"></textarea>
                 </div>
 
-                <button type="submit" class="submit-btn" data-i18n="btnSubmit">Envoyer ma demande</button>
+                <button type="submit" id="submitBtn" class="submit-btn" data-i18n="btnSubmit">Envoyer ma demande</button>
+                
+                <!-- رسالة النجاح (مخفية افتراضياً) -->
+                <div id="successMessage" class="success-message" data-i18n="successMessage">
+                    Votre demande a été envoyée avec succès. Nous vous contacterons dans les plus brefs délais.
+                </div>
             </form>
         </section>
     </div>
@@ -335,7 +372,7 @@
             bg.style.transform = `translateY(-${scrolled * 0.25}px)`;
         });
 
-        // ديناميكية حقول السكن (تظهر بالتتابع عند الكتابة)
+        // ديناميكية حقول السكن
         const countryInput = document.getElementById('countryInput');
         const cityGroup = document.getElementById('cityGroup');
         const cityInput = document.getElementById('cityInput');
@@ -362,7 +399,52 @@
             }
         });
 
-        // القاموس الشامل لكل اللغات
+        // التعامل مع زر الإرسال وإظهار رسالة النجاح بدون تحديث الصفحة
+        const bookingForm = document.getElementById('bookingForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const successMessage = document.getElementById('successMessage');
+
+        bookingForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // منع انتقال الصفحة
+
+            // تعطيل الزر لتجنب الإرسال المكرر
+            submitBtn.disabled = true;
+            submitBtn.textContent = '...'; 
+
+            const formData = new FormData(bookingForm);
+            const actionUrl = bookingForm.getAttribute('action');
+
+            // محاكاة الإرسال لإظهار الواجهة في حال لم يتم وضع رابط Formspree بعد
+            if(actionUrl.includes('YOUR_FORM_ID')) {
+                setTimeout(() => {
+                    successMessage.style.display = 'block';
+                    submitBtn.style.display = 'none'; // إخفاء الزر بعد النجاح
+                }, 800);
+                return;
+            }
+
+            // الإرسال الفعلي لـ Formspree
+            fetch(actionUrl, {
+                method: 'POST',
+                body: formData,
+                headers: { 'Accept': 'application/json' }
+            }).then(response => {
+                if (response.ok) {
+                    successMessage.style.display = 'block';
+                    submitBtn.style.display = 'none'; // إخفاء الزر بعد النجاح
+                } else {
+                    alert("عذراً، حدث خطأ. يرجى المحاولة مرة أخرى.");
+                    submitBtn.disabled = false;
+                    changeLanguage(document.documentElement.lang); // إعادة نص الزر للغته
+                }
+            }).catch(error => {
+                alert("تعذر الاتصال، تأكد من الإنترنت وحاول مجدداً.");
+                submitBtn.disabled = false;
+                changeLanguage(document.documentElement.lang);
+            });
+        });
+
+        // القاموس الشامل
         const translations = {
             ar: {
                 pageTitle: "حجز جلسة - أخصائية نفسية",
@@ -370,7 +452,8 @@
                 heroSubtitle: "أرافقك بكل لطف في فهم نفسك وما تمر به.",
                 formTitle: "حجز جلسة",
                 formDesc: "يُرجى تعبئة الاستمارة أدناه لإرسال طلب الحجز، وسيتصل بكم فريقنا لتأكيد حجزكم.",
-                labelName: "الاسم واللقب",
+                labelFirstName: "الاسم",
+                labelLastName: "اللقب",
                 labelAge: "العمر",
                 labelPhone: "رقم الهاتف / واتساب",
                 labelSessionType: "نوع الجلسة",
@@ -382,7 +465,8 @@
                 labelRegion: "الولاية أو المنطقة",
                 labelDetails: "وصف مختصر للصعوبة أو الطلب الحالي",
                 btnSubmit: "إرسال طلب الحجز",
-                optional: "(اختياري)"
+                optional: "(اختياري)",
+                successMessage: "تم إرسال طلبك بنجاح. سيتم التواصل معك في أقرب وقت ممكن."
             },
             en: {
                 pageTitle: "Book a Session - Psychologist",
@@ -390,7 +474,8 @@
                 heroSubtitle: "I gently accompany you in understanding yourself and what you are going through.",
                 formTitle: "Book a Session",
                 formDesc: "Please fill out the form below to submit your booking request. Our team will contact you to confirm.",
-                labelName: "Full Name",
+                labelFirstName: "First Name",
+                labelLastName: "Last Name",
                 labelAge: "Age",
                 labelPhone: "Phone Number / WhatsApp",
                 labelSessionType: "Session Type",
@@ -402,7 +487,8 @@
                 labelRegion: "State or Region",
                 labelDetails: "Brief description of the difficulty or current request",
                 btnSubmit: "Submit Booking Request",
-                optional: "(Optional)"
+                optional: "(Optional)",
+                successMessage: "Your request has been sent successfully. We will contact you as soon as possible."
             },
             fr: {
                 pageTitle: "Réserver une séance - Psychologue",
@@ -410,7 +496,8 @@
                 heroSubtitle: "Je vous accompagne avec bienveillance dans la compréhension de vous-même.",
                 formTitle: "Réserver une séance",
                 formDesc: "Veuillez remplir le formulaire ci-dessous. Notre équipe vous contactera pour confirmer votre rendez-vous.",
-                labelName: "Nom et prénom",
+                labelFirstName: "Prénom",
+                labelLastName: "Nom",
                 labelAge: "Âge",
                 labelPhone: "Numéro de téléphone / WhatsApp",
                 labelSessionType: "Type de séance",
@@ -422,7 +509,8 @@
                 labelRegion: "État ou Région",
                 labelDetails: "Brève description de la difficulté ou de la demande",
                 btnSubmit: "Envoyer ma demande",
-                optional: "(Optionnel)"
+                optional: "(Optionnel)",
+                successMessage: "Votre demande a été envoyée avec succès. Nous vous contacterons dans les plus brefs délais."
             },
             es: {
                 pageTitle: "Reservar una sesión - Psicóloga",
@@ -430,7 +518,8 @@
                 heroSubtitle: "Te acompaño con amabilidad a comprenderte a ti mismo y lo que estás pasando.",
                 formTitle: "Reservar una sesión",
                 formDesc: "Complete el siguiente formulario. Nuestro equipo se comunicará con usted para confirmar su cita.",
-                labelName: "Nombre completo",
+                labelFirstName: "Nombre",
+                labelLastName: "Apellido",
                 labelAge: "Edad",
                 labelPhone: "Número de teléfono / WhatsApp",
                 labelSessionType: "Tipo de sesión",
@@ -442,11 +531,11 @@
                 labelRegion: "Estado o Región",
                 labelDetails: "Breve descripción de la dificultad o solicitud",
                 btnSubmit: "Enviar solicitud de reserva",
-                optional: "(Opcional)"
+                optional: "(Opcional)",
+                successMessage: "Su solicitud ha sido enviada con éxito. Nos pondremos en contacto con usted lo antes posible."
             }
         };
 
-        // دالة تغيير اللغة
         function changeLanguage(lang) {
             if (lang === 'ar') {
                 document.documentElement.setAttribute('dir', 'rtl');
