@@ -17,8 +17,8 @@
         
         #loginScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #9c6f70; display: flex; justify-content: center; align-items: center; z-index: 1000; }
         .login-box { background: white; padding: 40px; border-radius: 15px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        .login-box input { width: 100%; padding: 12px; margin: 15px 0; border: 1.5px solid #ecdcdb; border-radius: 8px; font-family: 'Cairo'; }
-        .login-box button { background: #9c6f70; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; width: 100%; }
+        .login-box input { width: 100%; padding: 12px; margin: 15px 0; border: 1.5px solid #ecdcdb; border-radius: 8px; font-family: 'Cairo'; text-align: center; font-size: 1.1em;}
+        .login-box button { background: #9c6f70; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; width: 100%; font-size: 1.1em;}
         
         table { width: 100%; border-collapse: collapse; margin-top: 20px; min-width: 900px; }
         th, td { border: 1px solid #ecdcdb; padding: 12px; text-align: right; }
@@ -37,9 +37,9 @@
     <div id="loginScreen">
         <div class="login-box">
             <h2 style="color: #9c6f70;">تسجيل الدخول للإدارة</h2>
-            <input type="password" id="adminPass" placeholder="أدخل كلمة المرور...">
+            <input type="password" id="adminPass" placeholder="أدخل رمز الدخول...">
             <button onclick="checkPassword()">دخول</button>
-            <p id="errorMsg" style="color: red; display: none; font-size: 14px;">كلمة المرور خاطئة!</p>
+            <p id="errorMsg" style="color: red; display: none; font-size: 14px; margin-top: 10px;">رمز الدخول خاطئ!</p>
         </div>
     </div>
 
@@ -66,7 +66,8 @@
     </div>
 
     <script>
-        const SECRET_PASSWORD = "maria"; 
+        // تم تغيير رمز الدخول إلى 2025 بناءً على طلبك
+        const SECRET_PASSWORD = "2025"; 
 
         function checkPassword() {
             if (document.getElementById('adminPass').value === SECRET_PASSWORD) {
@@ -77,6 +78,13 @@
                 document.getElementById('errorMsg').style.display = 'block';
             }
         }
+
+        // تفعيل تسجيل الدخول عند الضغط على زر Enter
+        document.getElementById('adminPass').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
 
         const firebaseConfig = {
             apiKey: "AIzaSyA7R_QtuHcNVKPS82JH4eQmLy1ay6UYBJY",
