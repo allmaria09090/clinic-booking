@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حجز جلسة - أخصائية نفسية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #fcf9f8;
+            --primary-color: #9c6f70;
+            --secondary-color: #e5d1d0;
+            --text-main: #4a3f3e;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 50px 20px;
+            background-color: var(--secondary-color);
+            border-radius: 20px;
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            font-size: 1.1em;
+            color: #6d5b5a;
+        }
+
+        .booking-section {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .booking-section h2 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-family: 'Cairo', sans-serif;
+            background-color: #fafafa;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: #fff;
+        }
+
+        .submit-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            width: 100%;
+            font-size: 1.1em;
+            font-family: 'Cairo', sans-serif;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .submit-btn:hover {
+            background-color: #835b5c;
+        }
+
+        /* تنسيق الشبكة للحقول */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- قسم الترحيب -->
+        <header class="hero">
+            <h1>أهلاً بك في فضائك الآمن للاستماع والدعم</h1>
+            <p>أرافقك بكل لطف في فهم نفسك وما تمر به.</p>
+        </header>
+
+        <!-- قسم الحجز -->
+        <section class="booking-section">
+            <h2>حجز جلسة</h2>
+            <p style="text-align: center; margin-bottom: 30px;">يُرجى تعبئة الاستمارة أدناه لإرسال طلب الحجز، وسيتصل بكم فريقنا لتأكيد حجزكم.</p>
+            
+            <!-- نموذج الحجز - يمكن ربطه بـ Formspree كبداية سريعة -->
+            <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>الاسم واللقب *</label>
+                        <input type="text" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>العمر *</label>
+                        <input type="number" name="age" required>
+                    </div>
+                    <div class="form-group">
+                        <label>رقم الهاتف / واتساب *</label>
+                        <input type="tel" name="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label>البريد الإلكتروني</label>
+                        <input type="email" name="email">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>نوع الجلسة *</label>
+                    <select name="session_type" required>
+                        <option value="online">أونلاين عبر الواتساب</option>
+                        <option value="in_person">حضوري</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>وصف مختصر للصعوبة أو الطلب الحالي *</label>
+                    <textarea name="description" rows="4" required></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn">إرسال طلب الحجز</button>
+            </form>
+        </section>
+    </div>
+
+</body>
+</html>
