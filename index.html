@@ -361,46 +361,46 @@
 
         <!-- 1. واجهة الشروط والملاحظات -->
         <div id="termsContainer" class="terms-section">
-            <h2 data-i18n="termsTitle">ملاحظات مهمة قبل حجز جلستك</h2>
-            <p class="terms-intro" data-i18n="termsIntro">يرجى قراءة النقاط التالية والموافقة عليها قبل إرسال طلب الحجز:</p>
+            <h2 data-i18n="termsTitle">Notes importantes avant de réserver</h2>
+            <p class="terms-intro" data-i18n="termsIntro">Veuillez lire et accepter les points suivants avant de soumettre votre demande :</p>
             
             <div class="terms-list">
                 <div class="term-item">
-                    <strong data-i18n="t1_title">1. تأكيد الموعد</strong>
-                    <span data-i18n="t1_desc">إرسال طلب الحجز لا يعني أن الموعد قد تم تأكيده. سيتصل بك فريقنا لتأكيد الموعد وتزويدك بالتفاصيل اللازمة.</span>
+                    <strong data-i18n="t1_title">1. Confirmation</strong>
+                    <span data-i18n="t1_desc">Soumettre une demande ne confirme pas le rendez-vous. Notre équipe vous contactera.</span>
                 </div>
                 <div class="term-item">
-                    <strong data-i18n="t2_title">2. الدفع</strong>
-                    <span data-i18n="t2_desc">الجلسات الأونلاين تُدفع مسبقًا عبر CCP / بطاقة البريد قبل موعد الجلسة. الجلسات الحضورية تُدفع نقدًا في المركز.</span>
+                    <strong data-i18n="t2_title">2. Paiement</strong>
+                    <span data-i18n="t2_desc">Séances en ligne payées d'avance par CCP. Séances en présentiel payées en espèces au cabinet.</span>
                 </div>
                 <div class="term-item">
-                    <strong data-i18n="t3_title">3. الإلغاء</strong>
-                    <span data-i18n="t3_desc">في حال رغبتك في إلغاء الموعد، يُرجى إرسال رسالة إلغاء قبل الجلسة بـ 24 ساعة على الأقل.</span>
+                    <strong data-i18n="t3_title">3. Annulation</strong>
+                    <span data-i18n="t3_desc">Veuillez envoyer un message au moins 24h avant la séance pour annuler.</span>
                 </div>
                 <div class="term-item">
-                    <strong data-i18n="t4_title">4. عدم الحضور</strong>
-                    <span data-i18n="t4_desc">في حال عدم الحضور إلى جلسة أونلاين دون إبلاغ مسبق، يتم تأجيل الجلسة إلى الأسبوع التالي.</span>
+                    <strong data-i18n="t4_title">4. Absence</strong>
+                    <span data-i18n="t4_desc">Une absence sans préavis reporte la séance à la semaine suivante.</span>
                 </div>
                 <div class="term-item">
-                    <strong data-i18n="t5_title">5. الطوارئ</strong>
-                    <span data-i18n="t5_desc">الجلسات لا تُعد خدمة طوارئ نفسية. في حال وجود خطر فوري على سلامتك أو سلامة شخص آخر، يُرجى التوجه مباشرة إلى أقرب مصلحة استعجالات.</span>
+                    <strong data-i18n="t5_title">5. Urgences</strong>
+                    <span data-i18n="t5_desc">Ceci n'est pas un service d'urgence. En cas de danger immédiat, allez aux urgences.</span>
                 </div>
                 <div class="term-item">
-                    <strong data-i18n="t6_title">6. السرية والخصوصية</strong>
-                    <span data-i18n="t6_desc">تُعامل المعلومات التي تقدمها بسرية واحترام، وتُستخدم في إطار تنظيم ومتابعة طلبك وفق القواعد المهنية.</span>
+                    <strong data-i18n="t6_title">6. Confidentialité</strong>
+                    <span data-i18n="t6_desc">Vos informations sont traitées de manière strictement confidentielle.</span>
                 </div>
                 <div class="term-item">
-                    <strong data-i18n="t7_title">7. القُصّر</strong>
-                    <span data-i18n="t7_desc">بالنسبة للأشخاص الذين تقل أعمارهم عن السن القانوني، قد تكون موافقة الولي الشرعي مطلوبة وفقًا للإجراءات المعمول بها.</span>
+                    <strong data-i18n="t7_title">7. Mineurs</strong>
+                    <span data-i18n="t7_desc">Pour les mineurs, le consentement du tuteur légal peut être requis.</span>
                 </div>
             </div>
 
             <label class="checkbox-group">
                 <input type="checkbox" id="agreeCheckbox">
-                <span data-i18n="termsCheckbox">أقر بأنني قرأت هذه الملاحظات وفهمتها وأوافق عليها.</span>
+                <span data-i18n="termsCheckbox">Je reconnais avoir lu, compris et accepté ces notes.</span>
             </label>
 
-            <button id="btnContinue" class="submit-btn" disabled data-i18n="btnContinue">أوافق وأتابع الحجز</button>
+            <button id="btnContinue" class="submit-btn" disabled data-i18n="btnContinue">[ J'accepte et je continue ]</button>
         </div>
 
 
@@ -755,26 +755,13 @@
             localStorage.setItem('preferredLang', lang);
         }
 
-        // كشف اللغة عند تحميل الصفحة (تعتمد على الذاكرة أو لغات المتصفح المتعددة)
+        // تحديد اللغة عند الدخول: إما اللغة المحفوظة أو الفرنسية إجبارياً كافتراضي
         document.addEventListener("DOMContentLoaded", function() {
             const supportedLangs = ['ar', 'en', 'fr', 'es'];
             const savedLang = localStorage.getItem('preferredLang');
-            let finalLang = 'fr'; // الفرنسية كافتراضي نهائي
-
-            if (savedLang && supportedLangs.includes(savedLang)) {
-                // إذا كان المستخدم قد اختار لغة سابقاً
-                finalLang = savedLang;
-            } else {
-                // فحص جميع اللغات المفضلة المبرمجة في متصفح الزائر بالترتيب
-                const userLangs = navigator.languages || [navigator.language || navigator.userLanguage];
-                for (let i = 0; i < userLangs.length; i++) {
-                    let langCode = userLangs[i].substring(0, 2).toLowerCase();
-                    if (supportedLangs.includes(langCode)) {
-                        finalLang = langCode;
-                        break;
-                    }
-                }
-            }
+            
+            // إذا كان المستخدم قد اختار لغة سابقاً نستخدمها، وإلا فـ الفرنسية هي الأساسية دائماً
+            let finalLang = (savedLang && supportedLangs.includes(savedLang)) ? savedLang : 'fr';
             
             changeLanguage(finalLang);
         });
