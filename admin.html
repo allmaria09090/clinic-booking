@@ -3,96 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم الحجوزات - د. ماريا</title>
+    <title>لوحة تحكم الحجوزات - د. ماريا | Panel d'administration</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     
-    <!-- مكتبات Firebase -->
+    <!-- مكتبات Firebase (تم إضافة مكتبة Auth للمصادقة) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <!-- مكتبة تحميل الـ PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        /* إعدادات عامة للتجاوب */
         * { box-sizing: border-box; }
-        body { font-family: 'Cairo', sans-serif; background-color: #fcf9f8; margin: 0; padding: 15px; color: #4a3f3e; }
+        body { font-family: 'Cairo', sans-serif; background-color: #fcf9f8; margin: 0; padding: 15px; color: #4a3f3e; transition: all 0.3s ease; }
+        .container { width: 100%; max-width: 1350px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
         
-        .container { width: 100%; max-width: 1300px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
-        h1 { color: #9c6f70; text-align: center; border-bottom: 2px solid #f3e8d9; padding-bottom: 15px; margin-top: 0; }
+        .header-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f3e8d9; padding-bottom: 15px; margin-bottom: 20px; }
+        .header-bar h1 { color: #9c6f70; margin: 0; font-size: 1.8em; }
+        .lang-btn { background-color: white; border: 1px solid #9c6f70; color: #9c6f70; padding: 5px 15px; border-radius: 20px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; transition: 0.3s; }
+        .lang-btn:hover { background-color: #9c6f70; color: white; }
         
         #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #9c6f70; display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
         .login-box { background: white; padding: 40px; border-radius: 15px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 100%; max-width: 400px; }
-        .login-box input { width: 100%; padding: 12px; margin: 15px 0; border: 1.5px solid #ecdcdb; border-radius: 8px; font-family: 'Cairo'; text-align: center; font-size: 1.1em; outline: none; }
-        .login-box button { background: #9c6f70; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; width: 100%; font-size: 1.1em; transition: 0.3s; }
+        .login-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1.5px solid #ecdcdb; border-radius: 8px; font-family: 'Cairo'; text-align: center; font-size: 1.1em; outline: none; }
+        .login-box button { background: #9c6f70; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; width: 100%; font-size: 1.1em; transition: 0.3s; margin-top: 10px;}
         .login-box button:hover { background: #835b5c; }
         
-        /* شريط البحث المطور */
-        .search-container { margin: 20px 0; }
-        #searchInput { width: 100%; padding: 15px 20px; border-radius: 10px; border: 1.5px solid #ecdcdb; font-family: 'Cairo'; font-size: 1.05em; outline: none; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.02);}
-        #searchInput:focus { border-color: #9c6f70; box-shadow: 0 4px 15px rgba(156, 111, 112, 0.15);}
+        .search-container { margin: 20px 0; display: flex; gap: 10px; flex-wrap: wrap; }
+        #searchInput { flex-grow: 1; min-width: 250px; padding: 12px 20px; border-radius: 10px; border: 1.5px solid #ecdcdb; font-family: 'Cairo'; font-size: 1.05em; outline: none; }
+        #logoutBtn { background-color: #d32f2f; color: white; border: none; padding: 12px 20px; border-radius: 10px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; white-space: nowrap; }
 
-        /* تعديلات الجدول ليناسب الهاتف */
         .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 8px; }
-        table { width: 100%; border-collapse: collapse; min-width: 1050px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1200px; }
         th, td { border: 1px solid #ecdcdb; padding: 12px 10px; text-align: right; vertical-align: top;}
+        html[dir="ltr"] th, html[dir="ltr"] td { text-align: left; }
         th { background-color: #fdf7f0; color: #9c6f70; position: sticky; top: 0; z-index: 10; font-size: 1.05em; }
         tr:hover { background-color: #fcf9f8; }
         
-        select.status-dropdown { padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-family: 'Cairo'; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 10px;}
+        select.status-dropdown { padding: 6px; border-radius: 6px; border: 1px solid #ccc; font-family: 'Cairo'; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 5px;}
         .status-red { background-color: #ffeaea; color: #d32f2f; }
         .status-green { background-color: #eaf4ed; color: #2d6a4f; }
         .status-grey { background-color: #f0f0f0; color: #666; }
 
-        /* حقل الملاحظات وزر الـ PDF */
-        .notes-input { width: 100%; height: 75px; font-family: 'Cairo'; border: 1px dashed #ccc; border-radius: 6px; padding: 8px; resize: vertical; background: #fffaf5; outline: none; transition: 0.3s;}
+        .notes-input { width: 100%; height: 70px; font-family: 'Cairo'; border: 1px dashed #ccc; border-radius: 6px; padding: 8px; resize: vertical; background: #fffaf5; outline: none; transition: 0.3s;}
         .notes-input:focus { border-style: solid; border-color: #9c6f70; background: #fff;}
-        .pdf-btn { background-color: #4a3f3e; color: white; padding: 8px 10px; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; width: 100%; transition: background-color 0.3s; display: flex; align-items: center; justify-content: center; gap: 5px;}
-        .pdf-btn:hover { background-color: #2c2524; }
+        
+        .action-btns { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
+        .btn-small { flex: 1; padding: 6px; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; font-size: 0.9em; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 3px; }
+        .pdf-btn { background-color: #4a3f3e; color: white; } .pdf-btn:hover { background-color: #2c2524; }
+        .edit-btn { background-color: #f39c12; color: white; } .edit-btn:hover { background-color: #d68910; }
+        .del-btn { background-color: #e74c3c; color: white; } .del-btn:hover { background-color: #c0392b; }
 
-        /* أوامر الشاشات الصغيرة (الهواتف) */
+        /* نافذة التعديل المنبثقة (Modal) */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
+        .modal-content { background: white; padding: 25px; border-radius: 12px; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .modal-header h2 { margin: 0; color: #9c6f70; }
+        .close-modal { background: none; border: none; font-size: 1.5em; cursor: pointer; color: #888; }
+        .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .modal-group { display: flex; flex-direction: column; gap: 5px; }
+        .modal-group.full { grid-column: span 2; }
+        .modal-group label { font-weight: bold; color: #555; font-size: 0.9em; }
+        .modal-group input, .modal-group select, .modal-group textarea { padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-family: 'Cairo'; outline: none; }
+        .modal-group input:focus, .modal-group textarea:focus { border-color: #9c6f70; }
+        .modal-save-btn { background: #2d6a4f; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-family: 'Cairo'; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; }
+        .modal-save-btn:hover { background: #1b4332; }
+
         @media (max-width: 768px) {
-            body { padding: 10px; }
-            .container { padding: 15px; border-radius: 10px; }
-            h1 { font-size: 1.4em; }
-            #searchInput { padding: 12px 15px; font-size: 0.95em; }
-            th, td { padding: 8px; font-size: 0.9em; }
-            .notes-input { height: 60px; font-size: 0.9em; }
+            .modal-grid { grid-template-columns: 1fr; }
+            .modal-group.full { grid-column: span 1; }
+            .action-btns { flex-direction: column; }
         }
     </style>
 </head>
 <body>
 
-    <!-- شاشة تسجيل الدخول -->
+    <!-- شاشة تسجيل الدخول الآمنة -->
     <div id="loginScreen">
         <div class="login-box">
-            <h2 style="color: #9c6f70;">تسجيل الدخول للإدارة</h2>
-            <input type="password" id="adminPass" placeholder="أدخل رمز الدخول...">
-            <button onclick="checkPassword()">دخول</button>
-            <p id="errorMsg" style="color: red; display: none; font-size: 14px; margin-top: 10px;">رمز الدخول خاطئ!</p>
+            <h2 id="loginTitle" style="color: #9c6f70;">تسجيل دخول الإدارة</h2>
+            <input type="email" id="adminEmail" placeholder="البريد الإلكتروني للإدارة...">
+            <input type="password" id="adminPass" placeholder="كلمة المرور...">
+            <button id="loginBtnTxt" onclick="loginAdmin()">تسجيل الدخول</button>
+            <p id="errorMsg" style="color: #ffcccc; display: none; font-size: 15px; margin-top: 15px; font-weight: bold;">بيانات الدخول غير صحيحة!</p>
         </div>
     </div>
 
     <!-- لوحة التحكم -->
     <div class="container" id="adminPanel" style="display: none;">
-        <h1>لوحة تحكم الحجوزات 📋</h1>
+        <div class="header-bar">
+            <h1 id="panelTitle">لوحة تحكم الحجوزات 📋</h1>
+            <button class="lang-btn" onclick="toggleLanguage()" id="langToggleBtn">Français</button>
+        </div>
         
-        <!-- مربع البحث السريع -->
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="🔍 ابحث بالاسم، الهاتف، الحالة، المحافظة، أو أي كلمة في الملاحظات...">
+            <button id="logoutBtn" onclick="logoutAdmin()">تسجيل الخروج</button>
         </div>
 
-        <!-- حاوية الجدول المتجاوبة -->
         <div class="table-responsive">
             <table>
                 <thead>
                     <tr>
-                        <th width="10%">التاريخ</th>
-                        <th width="15%">الاسم والعمر</th>
-                        <th width="12%">الهاتف</th>
-                        <th width="10%">النوع والموقع</th>
-                        <th width="20%">وصف الحالة</th>
-                        <th width="20%">ملاحظات الأخصائية</th>
-                        <th width="13%">الحالة / الإجراء</th>
+                        <th id="thDate" width="10%">التاريخ</th>
+                        <th id="thName" width="15%">الاسم والعمر</th>
+                        <th id="thPhone" width="12%">الهاتف والبريد</th>
+                        <th id="thLoc" width="12%">النوع والموقع</th>
+                        <th id="thDesc" width="18%">وصف الحالة</th>
+                        <th id="thNotes" width="18%">ملاحظات الأخصائية</th>
+                        <th id="thActions" width="15%">الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
@@ -102,31 +120,61 @@
         </div>
     </div>
 
+    <!-- نافذة تعديل الطلب (Modal) -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">تعديل بيانات الطلب</h2>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <input type="hidden" id="editDocId">
+            <div class="modal-grid">
+                <div class="modal-group">
+                    <label id="lblFirst">الاسم الأول</label>
+                    <input type="text" id="editFirstName">
+                </div>
+                <div class="modal-group">
+                    <label id="lblLast">اللقب</label>
+                    <input type="text" id="editLastName">
+                </div>
+                <div class="modal-group">
+                    <label id="lblAge">العمر</label>
+                    <input type="number" id="editAge">
+                </div>
+                <div class="modal-group">
+                    <label id="lblPhone">رقم الهاتف</label>
+                    <input type="text" id="editPhone" dir="ltr">
+                </div>
+                <div class="modal-group">
+                    <label id="lblEmail">البريد الإلكتروني</label>
+                    <input type="email" id="editEmail" dir="ltr">
+                </div>
+                <div class="modal-group">
+                    <label id="lblType">نوع الجلسة</label>
+                    <select id="editSessionType">
+                        <option value="online">أونلاين (WhatsApp)</option>
+                        <option value="in_person">حضوري</option>
+                    </select>
+                </div>
+                <div class="modal-group">
+                    <label id="lblCountry">البلد</label>
+                    <input type="text" id="editCountry">
+                </div>
+                <div class="modal-group">
+                    <label id="lblCity">المدينة / المنطقة</label>
+                    <input type="text" id="editCity">
+                </div>
+                <div class="modal-group full">
+                    <label id="lblDesc">وصف الحالة</label>
+                    <textarea id="editDescription" rows="4"></textarea>
+                </div>
+            </div>
+            <button class="modal-save-btn" id="saveEditBtn" onclick="saveEditedData()">حفظ التعديلات</button>
+        </div>
+    </div>
+
     <script>
-        // تشفير مبدئي لكلمة 2025 بصيغة Base64 للتمويه
-        const SECRET_HASH = "MjAyNQ=="; 
-        
-        let allBookings = []; 
-        let filteredBookings = []; 
-        let renderLimit = 20; 
-
-        function checkPassword() {
-            const userInput = document.getElementById('adminPass').value;
-            // دالة btoa تقوم بتشفير المدخل لمطابقته مع الرمز المخفي
-            if (btoa(userInput) === SECRET_HASH) {
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('adminPanel').style.display = 'block';
-                fetchData();
-            } else {
-                document.getElementById('errorMsg').style.display = 'block';
-            }
-        }
-
-        document.getElementById('adminPass').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') checkPassword();
-        });
-
-        // إعدادات Firebase الخاصة بك
+        // إعدادات Firebase 
         const firebaseConfig = {
             apiKey: "AIzaSyA7R_QtuHcNVKPS82JH4eQmLy1ay6UYBJY",
             authDomain: "maria-clinic.firebaseapp.com",
@@ -136,8 +184,127 @@
             appId: "1:166573964155:web:13c1289a3e561b7c1b1bde"
         };
         firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
         const db = firebase.firestore();
 
+        let allBookings = []; 
+        let filteredBookings = []; 
+        let renderLimit = 20; 
+        let currentLang = 'ar';
+
+        // القاموس اللغوي للوحة الإدارة
+        const adminDict = {
+            ar: {
+                loginTitle: "تسجيل دخول الإدارة",
+                emailPlaceholder: "البريد الإلكتروني للإدارة...",
+                passPlaceholder: "كلمة المرور...",
+                loginBtnTxt: "تسجيل الدخول",
+                errorMsg: "بيانات الدخول غير صحيحة!",
+                panelTitle: "لوحة تحكم الحجوزات 📋",
+                searchPlaceholder: "🔍 ابحث بالاسم، الهاتف، الحالة، المحافظة، أو الملاحظات...",
+                logoutBtn: "تسجيل الخروج",
+                thDate: "التاريخ", thName: "الاسم والعمر", thPhone: "الهاتف والبريد", thLoc: "النوع والموقع",
+                thDesc: "وصف الحالة", thNotes: "ملاحظات الأخصائية", thActions: "الإجراءات",
+                notesPlaceholder: "أضفي ملاحظاتك الخاصة هنا...",
+                onlineTxt: "🌐 أونلاين", inpersonTxt: "🏥 حضوري", ageTxt: "العمر:",
+                statusUnread: "🔴 لم يتم الرد", statusRead: "🟢 تم الرد", statusCanceled: "⚪ ملغى",
+                btnPdf: "📄 PDF", btnEdit: "✏️ تعديل", btnDel: "🗑️ حذف",
+                delConfirm: "هل أنت متأكد من إزالة هذا الطلب نهائياً؟ لا يمكن التراجع عن هذا الإجراء.",
+                modalTitle: "تعديل بيانات الطلب", lblFirst: "الاسم الأول", lblLast: "اللقب",
+                lblAge: "العمر", lblPhone: "رقم الهاتف", lblEmail: "البريد الإلكتروني",
+                lblType: "نوع الجلسة", typeOnline: "أونلاين (WhatsApp)", typeInperson: "حضوري",
+                lblCountry: "البلد", lblCity: "المدينة / المنطقة", lblDesc: "وصف الحالة",
+                saveEditBtn: "حفظ التعديلات"
+            },
+            fr: {
+                loginTitle: "Connexion Administration",
+                emailPlaceholder: "Email de l'administrateur...",
+                passPlaceholder: "Mot de passe...",
+                loginBtnTxt: "Se connecter",
+                errorMsg: "Identifiants incorrects!",
+                panelTitle: "Tableau de Bord des Réservations 📋",
+                searchPlaceholder: "🔍 Rechercher nom, téléphone, statut, région ou notes...",
+                logoutBtn: "Déconnexion",
+                thDate: "Date", thName: "Nom & Âge", thPhone: "Tél & Email", thLoc: "Type & Lieu",
+                thDesc: "Description", thNotes: "Notes de la Psychologue", thActions: "Actions",
+                notesPlaceholder: "Ajoutez vos notes privées ici...",
+                onlineTxt: "🌐 En ligne", inpersonTxt: "🏥 Présentiel", ageTxt: "Âge:",
+                statusUnread: "🔴 Non répondu", statusRead: "🟢 Répondu", statusCanceled: "⚪ Annulé",
+                btnPdf: "📄 PDF", btnEdit: "✏️ Modifier", btnDel: "🗑️ Supprimer",
+                delConfirm: "Êtes-vous sûr de vouloir supprimer définitivement cette demande ? Cette action est irréversible.",
+                modalTitle: "Modifier la demande", lblFirst: "Prénom", lblLast: "Nom",
+                lblAge: "Âge", lblPhone: "Téléphone", lblEmail: "Email",
+                lblType: "Type de séance", typeOnline: "En ligne (WhatsApp)", typeInperson: "Présentiel",
+                lblCountry: "Pays", lblCity: "Ville / Région", lblDesc: "Description",
+                saveEditBtn: "Enregistrer les modifications"
+            }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'ar' ? 'fr' : 'ar';
+            document.documentElement.lang = currentLang;
+            document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+            document.getElementById('langToggleBtn').textContent = currentLang === 'ar' ? 'Français' : 'العربية';
+            applyTranslations();
+            renderTable(); // إعادة رسم الجدول لترجمة المحتوى الداخلي
+        }
+
+        function applyTranslations() {
+            const t = adminDict[currentLang];
+            document.getElementById('loginTitle').textContent = t.loginTitle;
+            document.getElementById('adminEmail').placeholder = t.emailPlaceholder;
+            document.getElementById('adminPass').placeholder = t.passPlaceholder;
+            document.getElementById('loginBtnTxt').textContent = t.loginBtnTxt;
+            document.getElementById('errorMsg').textContent = t.errorMsg;
+            document.getElementById('panelTitle').textContent = t.panelTitle;
+            document.getElementById('searchInput').placeholder = t.searchPlaceholder;
+            document.getElementById('logoutBtn').textContent = t.logoutBtn;
+            document.getElementById('thDate').textContent = t.thDate;
+            document.getElementById('thName').textContent = t.thName;
+            document.getElementById('thPhone').textContent = t.thPhone;
+            document.getElementById('thLoc').textContent = t.thLoc;
+            document.getElementById('thDesc').textContent = t.thDesc;
+            document.getElementById('thNotes').textContent = t.thNotes;
+            document.getElementById('thActions').textContent = t.thActions;
+            
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('lblFirst').textContent = t.lblFirst;
+            document.getElementById('lblLast').textContent = t.lblLast;
+            document.getElementById('lblAge').textContent = t.lblAge;
+            document.getElementById('lblPhone').textContent = t.lblPhone;
+            document.getElementById('lblEmail').textContent = t.lblEmail;
+            document.getElementById('lblType').textContent = t.lblType;
+            document.getElementById('editSessionType').options[0].text = t.typeOnline;
+            document.getElementById('editSessionType').options[1].text = t.typeInperson;
+            document.getElementById('lblCountry').textContent = t.lblCountry;
+            document.getElementById('lblCity').textContent = t.lblCity;
+            document.getElementById('lblDesc').textContent = t.lblDesc;
+            document.getElementById('saveEditBtn').textContent = t.saveEditBtn;
+        }
+
+        // المصادقة
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                fetchData();
+            } else {
+                document.getElementById('loginScreen').style.display = 'flex';
+                document.getElementById('adminPanel').style.display = 'none';
+            }
+        });
+
+        function loginAdmin() {
+            const email = document.getElementById('adminEmail').value;
+            const pass = document.getElementById('adminPass').value;
+            auth.signInWithEmailAndPassword(email, pass).catch(() => {
+                document.getElementById('errorMsg').style.display = 'block';
+            });
+        }
+        document.getElementById('adminPass').addEventListener('keypress', (e) => { if (e.key === 'Enter') loginAdmin(); });
+        function logoutAdmin() { auth.signOut().then(() => location.reload()); }
+
+        // جلب البيانات
         function fetchData() {
             db.collection("bookings").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
                 allBookings = [];
@@ -148,91 +315,142 @@
             });
         }
 
+        // عرض الجدول
         function renderTable() {
             const tableBody = document.getElementById('tableBody');
             tableBody.innerHTML = ""; 
-            
+            const t = adminDict[currentLang];
             const dataToRender = filteredBookings.slice(0, renderLimit);
 
             dataToRender.forEach((data) => {
-                let dateStr = "الآن";
+                let dateStr = "";
                 if(data.timestamp) {
                     const date = data.timestamp.toDate();
-                    // استخدام en-GB و en-US لفرض الأرقام الإنجليزية
                     const datePart = date.toLocaleDateString('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit' });
                     const timePart = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
                     dateStr = `<span dir="ltr">${datePart}</span><br><span dir="ltr">${timePart}</span>`;
                 }
 
+                let statusVal = data.status || "🔴 لم يتم الرد";
                 let statusClass = "status-red";
-                if(data.status.includes("تم الرد")) statusClass = "status-green";
-                if(data.status.includes("ملغى")) statusClass = "status-grey";
+                if(statusVal.includes("تم الرد") || statusVal.includes("Répondu")) statusClass = "status-green";
+                if(statusVal.includes("ملغى") || statusVal.includes("Annulé")) statusClass = "status-grey";
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td dir="ltr" style="text-align: right; font-size:0.9em; font-family: sans-serif;">${dateStr}</td>
-                    <td><strong>${data.firstName} ${data.lastName}</strong><br><span style="color:#777; font-size:0.9em;">العمر: <span style="font-family: sans-serif;">${data.age}</span></span></td>
-                    <td dir="ltr" style="text-align: right; font-family: sans-serif;"><strong>${data.phone}</strong></td>
-                    <td>${data.sessionType === 'online' ? '🌐 أونلاين' : '🏥 حضوري'}<br><span style="color:#777; font-size:0.85em;">${data.country} / ${data.city}</span></td>
-                    <td><div style="max-height:80px; overflow-y:auto; font-size:0.95em;">${data.description}</div></td>
+                    <td dir="ltr" style="font-size:0.9em; font-family: sans-serif; text-align: center;">${dateStr}</td>
+                    <td><strong>${data.firstName} ${data.lastName}</strong><br><span style="color:#777; font-size:0.9em;">${t.ageTxt} <span style="font-family: sans-serif;">${data.age}</span></span></td>
+                    <td dir="ltr" style="text-align: right; font-family: sans-serif;"><strong>${data.phone}</strong><br><span style="font-size:0.85em; color:#666;">${data.email || ''}</span></td>
+                    <td>${data.sessionType === 'online' ? t.onlineTxt : t.inpersonTxt}<br><span style="color:#777; font-size:0.85em;">${data.country} / ${data.city} ${data.region || ''}</span></td>
+                    <td><div style="max-height:80px; overflow-y:auto; font-size:0.95em; white-space: pre-wrap;">${data.description}</div></td>
                     <td>
-                        <textarea class="notes-input" placeholder="أضفي ملاحظاتك الخاصة هنا..." onblur="updateNotes('${data.id}', this.value)">${data.adminNotes || ''}</textarea>
+                        <textarea class="notes-input" placeholder="${t.notesPlaceholder}" onblur="updateNotes('${data.id}', this.value)">${data.adminNotes || ''}</textarea>
                     </td>
                     <td>
                         <select class="status-dropdown ${statusClass}" onchange="updateStatus('${data.id}', this)">
-                            <option value="🔴 لم يتم الرد" ${data.status === '🔴 لم يتم الرد' ? 'selected' : ''}>🔴 لم يتم الرد</option>
-                            <option value="🟢 تم الرد" ${data.status === '🟢 تم الرد' ? 'selected' : ''}>🟢 تم الرد</option>
-                            <option value="⚪ ملغى" ${data.status === '⚪ ملغى' ? 'selected' : ''}>⚪ ملغى</option>
+                            <option value="${t.statusUnread}" ${statusClass === 'status-red' ? 'selected' : ''}>${t.statusUnread}</option>
+                            <option value="${t.statusRead}" ${statusClass === 'status-green' ? 'selected' : ''}>${t.statusRead}</option>
+                            <option value="${t.statusCanceled}" ${statusClass === 'status-grey' ? 'selected' : ''}>${t.statusCanceled}</option>
                         </select>
-                        <button class="pdf-btn" onclick="downloadPDF('${data.id}')">📄 تحميل PDF</button>
+                        <div class="action-btns">
+                            <button class="btn-small edit-btn" onclick="openEditModal('${data.id}')">${t.btnEdit}</button>
+                            <button class="btn-small del-btn" onclick="deleteBooking('${data.id}')">${t.btnDel}</button>
+                            <button class="btn-small pdf-btn" onclick="downloadPDF('${data.id}')">${t.btnPdf}</button>
+                        </div>
                     </td>
                 `;
                 tableBody.appendChild(tr);
             });
         }
 
+        // البحث
         document.getElementById('searchInput').addEventListener('input', triggerSearch);
-
         function triggerSearch() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            
             filteredBookings = allBookings.filter(b => {
-                const allText = `${b.firstName} ${b.lastName} ${b.phone} ${b.age} ${b.country} ${b.city} ${b.region} ${b.description} ${b.adminNotes || ''} ${b.sessionType === 'online' ? 'أونلاين' : 'حضوري'} ${b.status}`.toLowerCase();
+                const allText = `${b.firstName} ${b.lastName} ${b.phone} ${b.email} ${b.age} ${b.country} ${b.city} ${b.region} ${b.description} ${b.adminNotes || ''} ${b.sessionType === 'online' ? 'أونلاين online' : 'حضوري in_person'} ${b.status}`.toLowerCase();
                 return allText.includes(searchTerm);
             });
-            
             renderLimit = 20; 
             renderTable();
         }
 
+        // التمرير اللانهائي
         window.addEventListener('scroll', () => {
             if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 50) {
-                if (renderLimit < filteredBookings.length) {
-                    renderLimit += 20; 
-                    renderTable();
-                }
+                if (renderLimit < filteredBookings.length) { renderLimit += 20; renderTable(); }
             }
         });
 
+        // تحديث الحالة والملاحظات
         function updateStatus(docId, selectElement) {
             const newStatus = selectElement.value;
             db.collection("bookings").doc(docId).update({ status: newStatus }).then(() => {
                 selectElement.className = "status-dropdown";
-                if(newStatus.includes("تم الرد")) selectElement.classList.add("status-green");
-                else if(newStatus.includes("ملغى")) selectElement.classList.add("status-grey");
+                if(newStatus.includes("تم الرد") || newStatus.includes("Répondu")) selectElement.classList.add("status-green");
+                else if(newStatus.includes("ملغى") || newStatus.includes("Annulé")) selectElement.classList.add("status-grey");
                 else selectElement.classList.add("status-red");
             });
         }
-
         function updateNotes(docId, notesValue) {
             db.collection("bookings").doc(docId).update({ adminNotes: notesValue });
         }
 
+        // نافذة التعديل
+        function openEditModal(docId) {
+            const data = allBookings.find(b => b.id === docId);
+            if(!data) return;
+            
+            document.getElementById('editDocId').value = docId;
+            document.getElementById('editFirstName').value = data.firstName || "";
+            document.getElementById('editLastName').value = data.lastName || "";
+            document.getElementById('editAge').value = data.age || "";
+            document.getElementById('editPhone').value = data.phone || "";
+            document.getElementById('editEmail').value = data.email === "لا يوجد" ? "" : (data.email || "");
+            document.getElementById('editSessionType').value = data.sessionType || "online";
+            document.getElementById('editCountry').value = data.country || "";
+            document.getElementById('editCity').value = (data.city || "") + (data.region ? " - " + data.region : "");
+            document.getElementById('editDescription').value = data.description || "";
+            
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('editModal').style.display = 'none'; }
+
+        function saveEditedData() {
+            const docId = document.getElementById('editDocId').value;
+            const updatedData = {
+                firstName: document.getElementById('editFirstName').value,
+                lastName: document.getElementById('editLastName').value,
+                age: document.getElementById('editAge').value,
+                phone: document.getElementById('editPhone').value,
+                email: document.getElementById('editEmail').value || "لا يوجد",
+                sessionType: document.getElementById('editSessionType').value,
+                country: document.getElementById('editCountry').value,
+                city: document.getElementById('editCity').value,
+                description: document.getElementById('editDescription').value,
+            };
+
+            document.getElementById('saveEditBtn').textContent = "...";
+            db.collection("bookings").doc(docId).update(updatedData).then(() => {
+                closeModal();
+                document.getElementById('saveEditBtn').textContent = adminDict[currentLang].saveEditBtn;
+            });
+        }
+
+        // الحذف
+        function deleteBooking(docId) {
+            if(confirm(adminDict[currentLang].delConfirm)) {
+                db.collection("bookings").doc(docId).delete();
+            }
+        }
+
+        // PDF
         function downloadPDF(docId) {
             const data = allBookings.find(b => b.id === docId);
             if (!data) return;
 
-            let dateStr = "غير محدد";
+            let dateStr = "";
             if(data.timestamp) {
                 const date = data.timestamp.toDate();
                 const datePart = date.toLocaleDateString('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit' });
@@ -240,41 +458,44 @@
                 dateStr = `${datePart} ${timePart}`;
             }
 
+            const t = adminDict[currentLang];
+            const sessionTypeTxt = data.sessionType === 'online' ? t.typeOnline : t.typeInperson;
+
             const pdfElement = document.createElement('div');
             pdfElement.innerHTML = `
                 <div style="padding: 40px; font-family: Arial, sans-serif; direction: rtl; text-align: right; color: #333;">
-                    <h1 style="color: #9c6f70; text-align: center; border-bottom: 2px solid #f3e8d9; padding-bottom: 10px;">سجل حالة المريض - د. ماريا</h1>
+                    <h1 style="color: #9c6f70; text-align: center; border-bottom: 2px solid #f3e8d9; padding-bottom: 10px;">${t.modalTitle.replace('تعديل بيانات ', 'سجل ')} - د. ماريا</h1>
                     
                     <h3 style="margin-top: 30px; color: #4a3f3e;">البيانات الشخصية</h3>
                     <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-                        <tr><td style="padding: 10px; border: 1px solid #ddd; background: #fdf7f0; width: 30%;">الاسم واللقب</td><td style="padding: 10px; border: 1px solid #ddd;"><strong>${data.firstName} ${data.lastName}</strong></td></tr>
-                        <tr><td style="padding: 10px; border: 1px solid #ddd; background: #fdf7f0;">العمر</td><td style="padding: 10px; border: 1px solid #ddd;">${data.age} سنة</td></tr>
-                        <tr><td style="padding: 10px; border: 1px solid #ddd; background: #fdf7f0;">رقم الهاتف</td><td dir="ltr" style="padding: 10px; border: 1px solid #ddd; text-align: right;">${data.phone}</td></tr>
-                        <tr><td style="padding: 10px; border: 1px solid #ddd; background: #fdf7f0;">موقع السكن</td><td style="padding: 10px; border: 1px solid #ddd;">${data.country || 'غير محدد'} - ${data.city || ''} - ${data.region || ''}</td></tr>
+                        <tr><td style="padding: 10px; border: 1px solid #ddd; background: #fdf7f0; width: 30%;">${t.thName}</td><td style="padding: 10px; border: 1px solid #ddd;"><strong>${data.firstName} ${data.lastName}</strong></td></tr>
+                        <tr><td style="padding: 10px; border: 1px solid #ddd; background: #fdf7f0;">${t.lblAge}</td><td style="padding: 10px; border: 1px solid #ddd;">${data.age}</td></tr>
+                        <tr><td style="padding: 10px; border: 1px solid #ddd; background: #fdf7f0;">${t.lblPhone}</td><td dir="ltr" style="padding: 10px; border: 1px solid #ddd; text-align: right;">${data.phone}</td></tr>
+                        <tr><td style="padding: 10px; border: 1px solid #ddd; background: #fdf7f0;">الموقع</td><td style="padding: 10px; border: 1px solid #ddd;">${data.country || ''} - ${data.city || ''} ${data.region || ''}</td></tr>
                     </table>
 
                     <h3 style="color: #4a3f3e;">تفاصيل الحجز</h3>
                     <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-                        <tr><td style="padding: 10px; border: 1px solid #ddd; background: #fdf7f0; width: 30%;">نوع الجلسة</td><td style="padding: 10px; border: 1px solid #ddd;">${data.sessionType === 'online' ? 'أونلاين (WhatsApp)' : 'حضوري'}</td></tr>
-                        <tr><td style="padding: 10px; border: 1px solid #ddd; background: #fdf7f0;">تاريخ الطلب</td><td dir="ltr" style="padding: 10px; border: 1px solid #ddd; text-align: right;">${dateStr}</td></tr>
-                        <tr><td style="padding: 10px; border: 1px solid #ddd; background: #fdf7f0;">البريد الإلكتروني</td><td dir="ltr" style="padding: 10px; border: 1px solid #ddd; text-align:right;">${data.email || 'لا يوجد'}</td></tr>
+                        <tr><td style="padding: 10px; border: 1px solid #ddd; background: #fdf7f0; width: 30%;">${t.lblType}</td><td style="padding: 10px; border: 1px solid #ddd;">${sessionTypeTxt}</td></tr>
+                        <tr><td style="padding: 10px; border: 1px solid #ddd; background: #fdf7f0;">${t.thDate}</td><td dir="ltr" style="padding: 10px; border: 1px solid #ddd; text-align: right;">${dateStr}</td></tr>
+                        <tr><td style="padding: 10px; border: 1px solid #ddd; background: #fdf7f0;">${t.lblEmail}</td><td dir="ltr" style="padding: 10px; border: 1px solid #ddd; text-align:right;">${data.email || 'لا يوجد'}</td></tr>
                     </table>
 
-                    <h3 style="color: #4a3f3e;">وصف الحالة (من المريض)</h3>
-                    <div style="padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #fafafa; min-height: 80px; line-height: 1.6;">
+                    <h3 style="color: #4a3f3e;">${t.thDesc}</h3>
+                    <div style="padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #fafafa; min-height: 80px; line-height: 1.6; white-space: pre-wrap;">
                         ${data.description || 'لا يوجد وصف'}
                     </div>
 
-                    <h3 style="color: #4a3f3e; margin-top: 30px;">ملاحظات الأخصائية (د. ماريا)</h3>
-                    <div style="padding: 15px; border: 2px solid #9c6f70; border-radius: 8px; background: #fff; min-height: 120px; line-height: 1.6;">
-                        ${data.adminNotes ? data.adminNotes.replace(/\n/g, '<br>') : 'لا توجد ملاحظات مضافة حتى الآن.'}
+                    <h3 style="color: #4a3f3e; margin-top: 30px;">${t.thNotes}</h3>
+                    <div style="padding: 15px; border: 2px solid #9c6f70; border-radius: 8px; background: #fff; min-height: 120px; line-height: 1.6; white-space: pre-wrap;">
+                        ${data.adminNotes || 'لا توجد ملاحظات مضافة حتى الآن.'}
                     </div>
                 </div>
             `;
 
             const opt = {
                 margin: [10, 10, 10, 10],
-                filename: `ملف_حالة_${data.firstName}_${data.lastName}.pdf`,
+                filename: `File_${data.firstName}_${data.lastName}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, useCORS: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
