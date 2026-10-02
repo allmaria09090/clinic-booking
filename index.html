@@ -197,6 +197,11 @@
                     <strong data-i18n="t7_title">7. Mineurs</strong>
                     <span data-i18n="t7_desc">Pour les mineurs, le consentement du tuteur légal peut être requis.</span>
                 </div>
+                <!-- الشرط الجديد -->
+                <div class="term-item">
+                    <strong data-i18n="t8_title">8. Politique de Remboursement</strong>
+                    <span data-i18n="t8_desc">Le paiement est exigé à l'avance. En cas d'annulation de votre part pour des raisons personnelles, ou en cas de désaccord ultérieur, les frais ne sont pas remboursables. Le remboursement n'est possible que si la psychologue annule la séance.</span>
+                </div>
             </div>
 
             <label class="checkbox-group">
@@ -255,7 +260,28 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label><span data-i18n="labelCountry">Pays</span><span class="optional-text" data-i18n="optional">(Optionnel)</span></label>
-                            <input type="text" name="country" id="countryInput">
+                            <select name="country" id="countryInput">
+                                <option value="" data-i18n="selectCountry">-- Choisissez le pays --</option>
+                                <option value="Algérie">Algérie / الجزائر</option>
+                                <option value="Maroc">Maroc / المغرب</option>
+                                <option value="Tunisie">Tunisie / تونس</option>
+                                <option value="Égypte">Égypte / مصر</option>
+                                <option value="Arabie Saoudite">Arabie Saoudite / السعودية</option>
+                                <option value="Émirats arabes unis">Émirats arabes unis / الإمارات</option>
+                                <option value="Irak">Irak / العراق</option>
+                                <option value="Jordanie">Jordanie / الأردن</option>
+                                <option value="Liban">Liban / لبنان</option>
+                                <option value="Qatar">Qatar / قطر</option>
+                                <option value="Koweït">Koweït / الكويت</option>
+                                <option value="France">France / فرنسا</option>
+                                <option value="Belgique">Belgique / بلجيكا</option>
+                                <option value="Suisse">Suisse / سويسرا</option>
+                                <option value="Canada">Canada / كندا</option>
+                                <option value="États-Unis">États-Unis / الولايات المتحدة</option>
+                                <option value="Royaume-Uni">Royaume-Uni / المملكة المتحدة</option>
+                                <option value="Espagne">Espagne / إسبانيا</option>
+                                <option value="Autre" data-i18n="optionOther">Autre pays / بلد آخر</option>
+                            </select>
                         </div>
                         <div class="form-group hidden" id="cityGroup">
                             <label><span data-i18n="labelCity">Ville</span><span class="optional-text" data-i18n="optional">(Optionnel)</span></label>
@@ -320,26 +346,23 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
-        // ديناميكية المدن
+        // ديناميكية اختيار البلد والمدينة والولاية
         const countryInput = document.getElementById('countryInput');
         const cityGroup = document.getElementById('cityGroup');
         const cityInput = document.getElementById('cityInput');
         const regionGroup = document.getElementById('regionGroup');
         const regionInput = document.getElementById('regionInput');
 
-        countryInput.addEventListener('input', function() {
-            if(this.value.trim().length > 0) {
+        countryInput.addEventListener('change', function() {
+            // إظهار المدينة والولاية فور اختيار أي بلد
+            if(this.value.trim() !== "") {
                 cityGroup.classList.remove('hidden');
-            } else {
-                cityGroup.classList.add('hidden'); regionGroup.classList.add('hidden');
-                cityInput.value = ''; regionInput.value = '';
-            }
-        });
-        cityInput.addEventListener('input', function() {
-            if(this.value.trim().length > 0) {
                 regionGroup.classList.remove('hidden');
             } else {
-                regionGroup.classList.add('hidden'); regionInput.value = '';
+                cityGroup.classList.add('hidden'); 
+                regionGroup.classList.add('hidden');
+                cityInput.value = ''; 
+                regionInput.value = '';
             }
         });
 
@@ -412,13 +435,15 @@
                 t5_title: "5. الطوارئ", t5_desc: "الجلسات لا تُعد خدمة طوارئ نفسية. في حال وجود خطر فوري على سلامتك، يُرجى التوجه لمصلحة استعجالات.",
                 t6_title: "6. السرية والخصوصية", t6_desc: "تُعامل المعلومات بسرية واحترام، وتُستخدم في إطار تنظيم ومتابعة طلبك وفق القواعد المهنية.",
                 t7_title: "7. القُصّر", t7_desc: "بالنسبة للأشخاص دون السن القانوني، قد تكون موافقة الولي الشرعي مطلوبة.",
+                t8_title: "8. سياسة الاسترجاع", t8_desc: "الدفع يتم مقدماً قبل الجلسة. في حال إلغاء الجلسة من قبلكم لأي ظروف شخصية، أو في حال حدوث أي خلاف لاحق، لا يتم استرجاع المبلغ المدفوع. الحالة الوحيدة لاسترداد الرسوم هي في حال إلغاء الجلسة من قِبل الأخصائية.",
                 termsCheckbox: "أقر بأنني قرأت هذه الملاحظات وفهمتها وأوافق عليها.", btnContinue: "[ أوافق وأتابع الحجز ]",
                 heroTitle: "أهلاً بك في فضائك الآمن للاستماع والدعم", heroSubtitle: "أرافقك بكل لطف في فهم نفسك وما تمر به.",
                 formTitle: "حجز جلسة", labelFirstName: "الاسم", labelLastName: "اللقب", labelAge: "العمر", labelPhone: "رقم الهاتف / واتساب",
                 labelSessionType: "نوع الجلسة", optionOnline: "أونلاين عبر الواتساب", optionInPerson: "حضوري",
                 labelEmail: "البريد الإلكتروني", labelCountry: "البلد", labelCity: "المدينة", labelRegion: "الولاية أو المنطقة",
                 labelDetails: "وصف مختصر للصعوبة أو الطلب الحالي", btnSubmit: "إرسال طلب الحجز", optional: "(اختياري)",
-                successMessage: "تم إرسال طلبك بنجاح. سيتم التواصل معك في أقرب وقت ممكن."
+                successMessage: "تم إرسال طلبك بنجاح. سيتم التواصل معك في أقرب وقت ممكن.",
+                selectCountry: "-- اختر البلد --", optionOther: "بلد آخر"
             },
             en: {
                 pageTitle: "Book a Session - Psychologist", termsTitle: "Important Notes Before Booking",
@@ -430,13 +455,15 @@
                 t5_title: "5. Emergencies", t5_desc: "Not an emergency service. Please visit the ER if at risk.",
                 t6_title: "6. Privacy", t6_desc: "Your information is treated with strict confidentiality.",
                 t7_title: "7. Minors", t7_desc: "Guardian consent may be required for minors.",
+                t8_title: "8. Refund Policy", t8_desc: "Payment is required in advance. If you cancel the session for personal reasons or if any disagreement arises, fees are non-refundable. Refunds are strictly limited to cancellations made by the psychologist.",
                 termsCheckbox: "I acknowledge that I have read, understood, and agree to these notes.", btnContinue: "[ I Agree & Continue ]",
                 heroTitle: "Welcome to your safe space for listening and support", heroSubtitle: "I gently accompany you in understanding yourself.",
                 formTitle: "Book a Session", labelFirstName: "First Name", labelLastName: "Last Name", labelAge: "Age", labelPhone: "Phone / WhatsApp",
                 labelSessionType: "Session Type", optionOnline: "Online via WhatsApp", optionInPerson: "In-Person",
                 labelEmail: "Email", labelCountry: "Country", labelCity: "City", labelRegion: "State or Region",
                 labelDetails: "Brief description of the difficulty", btnSubmit: "Submit Request", optional: "(Optional)",
-                successMessage: "Your request has been sent successfully. We will contact you soon."
+                successMessage: "Your request has been sent successfully. We will contact you soon.",
+                selectCountry: "-- Select Country --", optionOther: "Other Country"
             },
             fr: {
                 pageTitle: "Réserver une séance - Psychologue", termsTitle: "Notes importantes avant de réserver",
@@ -448,13 +475,15 @@
                 t5_title: "5. Urgences", t5_desc: "Ceci n'est pas un service d'urgence. Allez aux urgences en cas de danger.",
                 t6_title: "6. Confidentialité", t6_desc: "Vos informations sont traitées confidentiellement.",
                 t7_title: "7. Mineurs", t7_desc: "Le consentement du tuteur légal peut être requis.",
+                t8_title: "8. Politique de Remboursement", t8_desc: "Le paiement est exigé à l'avance. En cas d'annulation de votre part pour des raisons personnelles, ou en cas de désaccord ultérieur, les frais ne sont pas remboursables. Le remboursement n'est possible que si la psychologue annule la séance.",
                 termsCheckbox: "Je reconnais avoir lu, compris et accepté ces notes.", btnContinue: "[ J'accepte et je continue ]",
                 heroTitle: "Bienvenue dans votre espace d'écoute et de bienveillance", heroSubtitle: "Je vous accompagne avec bienveillance dans la compréhension de vous-même.",
                 formTitle: "Réserver une séance", labelFirstName: "Prénom", labelLastName: "Nom", labelAge: "Âge", labelPhone: "Téléphone / WhatsApp",
                 labelSessionType: "Type de séance", optionOnline: "En ligne (WhatsApp)", optionInPerson: "Présentiel",
                 labelEmail: "E-mail", labelCountry: "Pays", labelCity: "Ville", labelRegion: "État ou Région",
                 labelDetails: "Brève description de la difficulté", btnSubmit: "Envoyer ma demande", optional: "(Optionnel)",
-                successMessage: "Votre demande a été envoyée avec succès. Nous vous contacterons bientôt."
+                successMessage: "Votre demande a été envoyée avec succès. Nous vous contacterons bientôt.",
+                selectCountry: "-- Choisissez le pays --", optionOther: "Autre pays"
             },
             es: {
                 pageTitle: "Reservar sesión - Psicóloga", termsTitle: "Notas importantes antes de reservar",
@@ -466,13 +495,15 @@
                 t5_title: "5. Emergencias", t5_desc: "No es un servicio de emergencia. Acuda a urgencias si hay riesgo.",
                 t6_title: "6. Confidencialidad", t6_desc: "Su información es tratada con estricta confidencialidad.",
                 t7_title: "7. Menores", t7_desc: "Para menores, se puede requerir el consentimiento del tutor legal.",
+                t8_title: "8. Política de Reembolso", t8_desc: "El pago se requiere por adelantado. Si cancela la sesión por motivos personales o surge un desacuerdo, las tarifas no son reembolsables. Los reembolsos solo se emiten si la psicóloga cancela la sesión.",
                 termsCheckbox: "Reconozco que he leído y acepto estas notas.", btnContinue: "[ Acepto y continúo ]",
                 heroTitle: "Bienvenido a tu espacio seguro de escucha y apoyo", heroSubtitle: "Te acompaño con amabilidad a comprenderte a ti mismo.",
                 formTitle: "Reservar una sesión", labelFirstName: "Nombre", labelLastName: "Apellido", labelAge: "Edad", labelPhone: "Teléfono / WhatsApp",
                 labelSessionType: "Tipo de sesión", optionOnline: "En línea (WhatsApp)", optionInPerson: "Presencial",
                 labelEmail: "Correo", labelCountry: "País", labelCity: "Ciudad", labelRegion: "Estado",
                 labelDetails: "Breve descripción", btnSubmit: "Enviar solicitud", optional: "(Opcional)",
-                successMessage: "Su solicitud ha sido enviada con éxito. Nos contactaremos pronto."
+                successMessage: "Su solicitud ha sido enviada con éxito. Nos contactaremos pronto.",
+                selectCountry: "-- Seleccionar país --", optionOther: "Otro país"
             }
         };
 
@@ -482,7 +513,10 @@
             document.getElementById('languageSelector').value = lang;
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if (translations[lang] && translations[lang][key]) el.textContent = translations[lang][key];
+                if (translations[lang] && translations[lang][key]) {
+                    // إذا كان العنصر يحتوي على قيمة placeholder أو غيره يمكن إضافتها، حالياً نغير النص
+                    el.textContent = translations[lang][key];
+                }
             });
             localStorage.setItem('preferredLang', lang);
         }
