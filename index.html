@@ -260,27 +260,28 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label><span data-i18n="labelCountry">Pays</span><span class="optional-text" data-i18n="optional">(Optionnel)</span></label>
+                            <!-- القائمة المنسدلة للبلدان مع إضافة data-i18n -->
                             <select name="country" id="countryInput">
                                 <option value="" data-i18n="selectCountry">-- Choisissez le pays --</option>
-                                <option value="Algérie">Algérie / الجزائر</option>
-                                <option value="Maroc">Maroc / المغرب</option>
-                                <option value="Tunisie">Tunisie / تونس</option>
-                                <option value="Égypte">Égypte / مصر</option>
-                                <option value="Arabie Saoudite">Arabie Saoudite / السعودية</option>
-                                <option value="Émirats arabes unis">Émirats arabes unis / الإمارات</option>
-                                <option value="Irak">Irak / العراق</option>
-                                <option value="Jordanie">Jordanie / الأردن</option>
-                                <option value="Liban">Liban / لبنان</option>
-                                <option value="Qatar">Qatar / قطر</option>
-                                <option value="Koweït">Koweït / الكويت</option>
-                                <option value="France">France / فرنسا</option>
-                                <option value="Belgique">Belgique / بلجيكا</option>
-                                <option value="Suisse">Suisse / سويسرا</option>
-                                <option value="Canada">Canada / كندا</option>
-                                <option value="États-Unis">États-Unis / الولايات المتحدة</option>
-                                <option value="Royaume-Uni">Royaume-Uni / المملكة المتحدة</option>
-                                <option value="Espagne">Espagne / إسبانيا</option>
-                                <option value="Autre" data-i18n="optionOther">Autre pays / بلد آخر</option>
+                                <option value="Algérie" data-i18n="country_dz">Algérie</option>
+                                <option value="Maroc" data-i18n="country_ma">Maroc</option>
+                                <option value="Tunisie" data-i18n="country_tn">Tunisie</option>
+                                <option value="Égypte" data-i18n="country_eg">Égypte</option>
+                                <option value="Arabie Saoudite" data-i18n="country_sa">Arabie Saoudite</option>
+                                <option value="Émirats arabes unis" data-i18n="country_ae">Émirats arabes unis</option>
+                                <option value="Irak" data-i18n="country_iq">Irak</option>
+                                <option value="Jordanie" data-i18n="country_jo">Jordanie</option>
+                                <option value="Liban" data-i18n="country_lb">Liban</option>
+                                <option value="Qatar" data-i18n="country_qa">Qatar</option>
+                                <option value="Koweït" data-i18n="country_kw">Koweït</option>
+                                <option value="France" data-i18n="country_fr">France</option>
+                                <option value="Belgique" data-i18n="country_be">Belgique</option>
+                                <option value="Suisse" data-i18n="country_ch">Suisse</option>
+                                <option value="Canada" data-i18n="country_ca">Canada</option>
+                                <option value="États-Unis" data-i18n="country_us">États-Unis</option>
+                                <option value="Royaume-Uni" data-i18n="country_uk">Royaume-Uni</option>
+                                <option value="Espagne" data-i18n="country_es">Espagne</option>
+                                <option value="Autre" data-i18n="optionOther">Autre pays</option>
                             </select>
                         </div>
                         <div class="form-group hidden" id="cityGroup">
@@ -443,7 +444,12 @@
                 labelEmail: "البريد الإلكتروني", labelCountry: "البلد", labelCity: "المدينة", labelRegion: "الولاية أو المنطقة",
                 labelDetails: "وصف مختصر للصعوبة أو الطلب الحالي", btnSubmit: "إرسال طلب الحجز", optional: "(اختياري)",
                 successMessage: "تم إرسال طلبك بنجاح. سيتم التواصل معك في أقرب وقت ممكن.",
-                selectCountry: "-- اختر البلد --", optionOther: "بلد آخر"
+                selectCountry: "-- اختر البلد --", optionOther: "بلد آخر",
+                // ترجمة البلدان
+                country_dz: "الجزائر", country_ma: "المغرب", country_tn: "تونس", country_eg: "مصر", country_sa: "السعودية",
+                country_ae: "الإمارات", country_iq: "العراق", country_jo: "الأردن", country_lb: "لبنان", country_qa: "قطر",
+                country_kw: "الكويت", country_fr: "فرنسا", country_be: "بلجيكا", country_ch: "سويسرا", country_ca: "كندا",
+                country_us: "الولايات المتحدة", country_uk: "المملكة المتحدة", country_es: "إسبانيا"
             },
             en: {
                 pageTitle: "Book a Session - Psychologist", termsTitle: "Important Notes Before Booking",
@@ -463,7 +469,12 @@
                 labelEmail: "Email", labelCountry: "Country", labelCity: "City", labelRegion: "State or Region",
                 labelDetails: "Brief description of the difficulty", btnSubmit: "Submit Request", optional: "(Optional)",
                 successMessage: "Your request has been sent successfully. We will contact you soon.",
-                selectCountry: "-- Select Country --", optionOther: "Other Country"
+                selectCountry: "-- Select Country --", optionOther: "Other Country",
+                // Translations for countries
+                country_dz: "Algeria", country_ma: "Morocco", country_tn: "Tunisia", country_eg: "Egypt", country_sa: "Saudi Arabia",
+                country_ae: "United Arab Emirates", country_iq: "Iraq", country_jo: "Jordan", country_lb: "Lebanon", country_qa: "Qatar",
+                country_kw: "Kuwait", country_fr: "France", country_be: "Belgium", country_ch: "Switzerland", country_ca: "Canada",
+                country_us: "United States", country_uk: "United Kingdom", country_es: "Spain"
             },
             fr: {
                 pageTitle: "Réserver une séance - Psychologue", termsTitle: "Notes importantes avant de réserver",
@@ -483,7 +494,12 @@
                 labelEmail: "E-mail", labelCountry: "Pays", labelCity: "Ville", labelRegion: "État ou Région",
                 labelDetails: "Brève description de la difficulté", btnSubmit: "Envoyer ma demande", optional: "(Optionnel)",
                 successMessage: "Votre demande a été envoyée avec succès. Nous vous contacterons bientôt.",
-                selectCountry: "-- Choisissez le pays --", optionOther: "Autre pays"
+                selectCountry: "-- Choisissez le pays --", optionOther: "Autre pays",
+                // Traductions des pays
+                country_dz: "Algérie", country_ma: "Maroc", country_tn: "Tunisie", country_eg: "Égypte", country_sa: "Arabie Saoudite",
+                country_ae: "Émirats arabes unis", country_iq: "Irak", country_jo: "Jordanie", country_lb: "Liban", country_qa: "Qatar",
+                country_kw: "Koweït", country_fr: "France", country_be: "Belgique", country_ch: "Suisse", country_ca: "Canada",
+                country_us: "États-Unis", country_uk: "Royaume-Uni", country_es: "Espagne"
             },
             es: {
                 pageTitle: "Reservar sesión - Psicóloga", termsTitle: "Notas importantes antes de reservar",
@@ -503,7 +519,12 @@
                 labelEmail: "Correo", labelCountry: "País", labelCity: "Ciudad", labelRegion: "Estado",
                 labelDetails: "Breve descripción", btnSubmit: "Enviar solicitud", optional: "(Opcional)",
                 successMessage: "Su solicitud ha sido enviada con éxito. Nos contactaremos pronto.",
-                selectCountry: "-- Seleccionar país --", optionOther: "Otro país"
+                selectCountry: "-- Seleccionar país --", optionOther: "Otro país",
+                // Traducciones de países
+                country_dz: "Argelia", country_ma: "Marruecos", country_tn: "Túnez", country_eg: "Egipto", country_sa: "Arabia Saudita",
+                country_ae: "Emiratos Árabes Unidos", country_iq: "Irak", country_jo: "Jordania", country_lb: "Líbano", country_qa: "Catar",
+                country_kw: "Kuwait", country_fr: "Francia", country_be: "Bélgica", country_ch: "Suiza", country_ca: "Canadá",
+                country_us: "Estados Unidos", country_uk: "Reino Unido", country_es: "España"
             }
         };
 
@@ -514,7 +535,6 @@
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (translations[lang] && translations[lang][key]) {
-                    // إذا كان العنصر يحتوي على قيمة placeholder أو غيره يمكن إضافتها، حالياً نغير النص
                     el.textContent = translations[lang][key];
                 }
             });
